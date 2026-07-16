@@ -1,0 +1,66 @@
+{{define "title"}}Order {{.Code}} — TechPort{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container container-narrow">
+        {{if .Placed}}
+        <div class="form-banner form-banner-success">
+            <strong>Order placed — thank you, {{.CustomerName}}!</strong><br>
+            We'll call or WhatsApp you on {{.Phone}} to confirm. Keep {{money .Total}} ready in cash on delivery.
+        </div>
+        {{end}}
+
+        <div class="order-head">
+            <div>
+                <h1 class="page-title">Order {{.Code}}</h1>
+                <p class="order-meta">Placed {{.CreatedAt.Format "2 Jan 2006, 3:04 PM"}} · Cash on Delivery</p>
+            </div>
+            {{if .WhatsAppLink}}<a class="btn btn-whatsapp btn-sm-inline" href="{{.WhatsAppLink}}" target="_blank" rel="noopener">Need help? WhatsApp us</a>{{end}}
+        </div>
+
+        {{if .Terminated}}
+        <div class="form-banner form-banner-error">This order was {{.Status}}. Contact us on WhatsApp if you have questions.</div>
+        {{else}}
+        <ol class="timeline">
+            {{range .Steps}}
+            <li class="timeline-step {{if .Done}}done{{end}} {{if .Current}}current{{end}}">
+                <span class="timeline-dot"></span>
+                <span class="timeline-label">{{.Label}}</span>
+            </li>
+            {{end}}
+        </ol>
+        {{end}}
+
+        <div class="order-grid">
+            <div class="order-items">
+                <h2 class="form-section-title">Items</h2>
+                {{range .Items}}
+                <div class="summary-row summary-item">
+                    <span>{{.Title}}{{if .Options}} ({{range $k, $v := .Options}}{{$v}} {{end}}){{end}} × {{.Qty}}</span>
+                    <span>{{money .LineTotal}}</span>
+                </div>
+                {{end}}
+                <div class="summary-row"><span>Subtotal</span><span>{{money .Subtotal}}</span></div>
+                <div class="summary-row"><span>Shipping</span><span>{{if eq .ShippingFee 0.0}}Free{{else}}{{money .ShippingFee}}{{end}}</span></div>
+                <div class="summary-row summary-total"><span>Total (cash on delivery)</span><span>{{money .Total}}</span></div>
+            </div>
+            <div class="order-address">
+                <h2 class="form-section-title">Delivery to</h2>
+                <p>{{.CustomerName}}<br>{{.Address}}<br>{{.City}}<br>{{.Phone}}</p>
+                {{if .Notes}}<p class="order-notes">Note: {{.Notes}}</p>{{end}}
+            </div>
+        </div>
+
+        <div class="order-history">
+            <h2 class="form-section-title">History</h2>
+            <ul class="event-list">
+                {{range .Events}}
+                <li><span class="event-time">{{.CreatedAt.Format "2 Jan, 3:04 PM"}}</span> {{.Note}}</li>
+                {{end}}
+            </ul>
+        </div>
+
+        <p class="order-track-hint">Save your order code <strong>{{.Code}}</strong> — you can check status anytime at <a href="/track">techport → Track order</a>.</p>
+    </div>
+</section>
+{{end}}

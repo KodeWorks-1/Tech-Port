@@ -1,0 +1,85 @@
+{{define "title"}}Checkout — TechPort{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container">
+        <h1 class="page-title">Checkout</h1>
+
+        {{with .Errors.form}}<div class="form-banner form-banner-error">{{.}}</div>{{end}}
+
+        <form class="checkout-grid" method="post" action="/checkout">
+            <div class="checkout-form">
+                <h2 class="form-section-title">Delivery details</h2>
+
+                <label class="field">
+                    <span>Full name</span>
+                    <input name="name" value="{{.Values.name}}" placeholder="e.g. Ahmed Khan" required>
+                    {{with .Errors.name}}<em class="field-error">{{.}}</em>{{end}}
+                </label>
+
+                <label class="field">
+                    <span>Mobile number</span>
+                    <input name="phone" type="tel" value="{{.Values.phone}}" placeholder="03XX XXXXXXX" required>
+                    {{with .Errors.phone}}<em class="field-error">{{.}}</em>{{end}}
+                </label>
+
+                <label class="field">
+                    <span>Complete address</span>
+                    <textarea name="address" rows="3" placeholder="House / street / area" required>{{.Values.address}}</textarea>
+                    {{with .Errors.address}}<em class="field-error">{{.}}</em>{{end}}
+                </label>
+
+                <div class="field-row">
+                    <label class="field">
+                        <span>City</span>
+                        <input name="city" value="{{.Values.city}}" placeholder="e.g. Lahore" required>
+                        {{with .Errors.city}}<em class="field-error">{{.}}</em>{{end}}
+                    </label>
+                </div>
+
+                <label class="field">
+                    <span>Order notes <small>(optional)</small></span>
+                    <input name="notes" value="{{.Values.notes}}" placeholder="Anything we should know?">
+                </label>
+
+                <h2 class="form-section-title">Payment method</h2>
+                {{with .Errors.payment_method}}<em class="field-error">{{.}}</em>{{end}}
+                <div class="pay-methods">
+                    {{$sel := .Values.payment_method}}
+                    {{range .Methods}}
+                    <label class="pay-method {{if not .Enabled}}pay-method-disabled{{end}}">
+                        <input type="radio" name="payment_method" value="{{.Key}}"
+                               {{if not .Enabled}}disabled{{end}}
+                               {{if eq $sel .Key}}checked{{end}}>
+                        <span class="pay-method-label">{{.Label}}</span>
+                        {{if .Enabled}}
+                        <span class="pay-badge pay-badge-on">Available</span>
+                        {{else}}
+                        <span class="pay-badge">Coming soon</span>
+                        {{end}}
+                    </label>
+                    {{end}}
+                </div>
+                <p class="pay-note">Pay in cash when your order arrives. Online payments are coming soon.</p>
+            </div>
+
+            <aside class="cart-summary">
+                <h2>Your order</h2>
+                {{range .Cart.Items}}
+                <div class="summary-row summary-item">
+                    <span>{{.Title}} × {{.Qty}}</span><span>{{money .LineTotal}}</span>
+                </div>
+                {{end}}
+                <div class="summary-row"><span>Subtotal</span><span>{{money .Cart.Subtotal}}</span></div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>{{if eq .ShippingFee 0.0}}Free{{else}}{{money .ShippingFee}}{{end}}</span>
+                </div>
+                <div class="summary-row summary-total"><span>Total</span><span>{{money .Total}}</span></div>
+                <button class="btn btn-primary btn-block btn-lg" type="submit">Place order</button>
+                <p class="cod-note">You'll pay {{money .Total}} in cash on delivery</p>
+            </aside>
+        </form>
+    </div>
+</section>
+{{end}}

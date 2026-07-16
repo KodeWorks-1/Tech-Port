@@ -1,0 +1,24 @@
+{{define "title"}}Track your order — TechPort{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container container-narrow">
+        <h1 class="page-title">Track your order</h1>
+        <p class="track-intro">Enter your order code (from your confirmation) and the mobile number you ordered with.</p>
+
+        {{with .Error}}<div class="form-banner form-banner-error">{{.}}</div>{{end}}
+
+        <form class="track-form" method="get" action="/track">
+            <label class="field">
+                <span>Order code</span>
+                <input name="code" value="{{.Code}}" placeholder="TP-XXXXXX" required>
+            </label>
+            <label class="field">
+                <span>Mobile number</span>
+                <input name="phone" type="tel" value="{{.Phone}}" placeholder="03XX XXXXXXX" required>
+            </label>
+            <button class="btn btn-primary" type="submit">Track order</button>
+        </form>
+    </div>
+</section>
+{{end}}

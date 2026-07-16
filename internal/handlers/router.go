@@ -12,12 +12,13 @@ import (
 type Handlers struct {
 	catalog  *services.Catalog
 	cart     *services.Cart
+	orders   *services.Orders
 	settings *services.Settings
 	renderer *Renderer
 }
 
-func New(catalog *services.Catalog, cart *services.Cart, settings *services.Settings, renderer *Renderer) *Handlers {
-	return &Handlers{catalog: catalog, cart: cart, settings: settings, renderer: renderer}
+func New(catalog *services.Catalog, cart *services.Cart, orders *services.Orders, settings *services.Settings, renderer *Renderer) *Handlers {
+	return &Handlers{catalog: catalog, cart: cart, orders: orders, settings: settings, renderer: renderer}
 }
 
 func (h *Handlers) Router() http.Handler {
@@ -46,6 +47,11 @@ func (h *Handlers) Router() http.Handler {
 		r.Get("/cart/count", h.CartCount)
 		r.Post("/cart/items", h.CartAdd)
 		r.Post("/cart/items/{id}", h.CartSetQty)
+
+		r.Get("/checkout", h.Checkout)
+		r.Post("/checkout", h.PlaceOrder)
+		r.Get("/order/{code}", h.OrderPage)
+		r.Get("/track", h.Track)
 	})
 
 	return r
