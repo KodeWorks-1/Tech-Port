@@ -33,12 +33,14 @@ type PlaceOrderInput struct {
 	City          string
 	PaymentMethod string
 	Notes         string
+	UserID        *int64 // set when a logged-in customer places the order
 }
 
 type Order struct {
 	ID            int64
 	Code          string
 	SessionID     string
+	UserID        *int64
 	CustomerName  string
 	Phone         string
 	Address       string
@@ -140,11 +142,11 @@ func (o *Orders) Place(ctx context.Context, sessionID string, in PlaceOrderInput
 	for attempt := 0; ; attempt++ {
 		code = genOrderCode()
 		err = tx.QueryRow(ctx, `
-			INSERT INTO orders (code, session_id, customer_name, phone, address, city,
+			INSERT INTO orders (code, session_id, user_id, customer_name, phone, address, city,
 			                    payment_method, status, subtotal, shipping_fee, total, notes)
-			VALUES ($1,$2,$3,$4,$5,$6,$7,'pending',$8,$9,$10,$11)
+			VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'pending',$9,$10,$11,$12)
 			RETURNING id`,
-			code, sessionID, in.CustomerName, in.Phone, in.Address, in.City,
+			code, sessionID, in.UserID, in.CustomerName, in.Phone, in.Address, in.City,
 			in.PaymentMethod, subtotal, fee, total, in.Notes,
 		).Scan(&orderID)
 		var pgErr *pgconn.PgError
@@ -192,6 +194,39 @@ func (o *Orders) Place(ctx context.Context, sessionID string, in PlaceOrderInput
 	return code, nil
 }
 
+// OrderSummary is the "my orders" list row.
+type OrderSummary struct {
+	Code      string
+	Status    string
+	Total     float64
+	ItemCount int
+	CreatedAt time.Time
+}
+
+// ForUser lists orders belonging to the account or placed with its phone.
+func (o *Orders) ForUser(ctx context.Context, userID int64, phone string) ([]OrderSummary, error) {
+	rows, err := o.pool.Query(ctx, `
+		SELECT code, status, total,
+		       (SELECT COALESCE(SUM(qty),0) FROM order_items WHERE order_id=o.id),
+		       created_at
+		FROM orders o
+		WHERE user_id = $1 OR phone = $2
+		ORDER BY created_at DESC LIMIT 100`, userID, phone)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []OrderSummary
+	for rows.Next() {
+		var s OrderSummary
+		if err := rows.Scan(&s.Code, &s.Status, &s.Total, &s.ItemCount, &s.CreatedAt); err != nil {
+			return nil, err
+		}
+		out = append(out, s)
+	}
+	return out, rows.Err()
+}
+
 // ByID loads an order for the admin views.
 func (o *Orders) ByID(ctx context.Context, id int64) (OrderDetail, error) {
 	var code string
@@ -208,10 +243,10 @@ func (o *Orders) ByID(ctx context.Context, id int64) (OrderDetail, error) {
 func (o *Orders) ByCode(ctx context.Context, code string) (OrderDetail, error) {
 	var d OrderDetail
 	err := o.pool.QueryRow(ctx, `
-		SELECT id, code, session_id, customer_name, phone, address, city,
+		SELECT id, code, session_id, user_id, customer_name, phone, address, city,
 		       payment_method, status, subtotal, shipping_fee, total, notes, created_at
 		FROM orders WHERE code = $1`, code,
-	).Scan(&d.ID, &d.Code, &d.SessionID, &d.CustomerName, &d.Phone, &d.Address, &d.City,
+	).Scan(&d.ID, &d.Code, &d.SessionID, &d.UserID, &d.CustomerName, &d.Phone, &d.Address, &d.City,
 		&d.PaymentMethod, &d.Status, &d.Subtotal, &d.ShippingFee, &d.Total, &d.Notes, &d.CreatedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return d, ErrNotFound

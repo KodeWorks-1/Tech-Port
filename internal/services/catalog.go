@@ -91,6 +91,23 @@ func (c *Catalog) Deals(ctx context.Context, limit int) ([]models.ProductCard, e
 		LIMIT $1`, limit)
 }
 
+// JustForYou pages through the whole catalog in a stable pseudo-shuffled
+// order (hash of slug), Daraz-feed style. Returns hasMore for the load-more
+// button.
+func (c *Catalog) JustForYou(ctx context.Context, page, perPage int) ([]models.ProductCard, bool, error) {
+	offset := (page - 1) * perPage
+	cards, err := c.cards(ctx,
+		productCardQuery+` ORDER BY md5(p.slug) LIMIT $1 OFFSET $2`, perPage+1, offset)
+	if err != nil {
+		return nil, false, err
+	}
+	hasMore := len(cards) > perPage
+	if hasMore {
+		cards = cards[:perPage]
+	}
+	return cards, hasMore, nil
+}
+
 // Search matches title, brand, and description case-insensitively.
 func (c *Catalog) Search(ctx context.Context, q string, limit int) ([]models.ProductCard, error) {
 	pat := "%" + strings.ReplaceAll(strings.ReplaceAll(q, "%", `\%`), "_", `\_`) + "%"

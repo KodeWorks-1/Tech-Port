@@ -1,0 +1,25 @@
+{{define "title"}}Login — TechPort{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container auth-wrap">
+        <form class="auth-card" method="post" action="/login">
+            <h1 class="page-title">Welcome back</h1>
+            <p class="auth-sub">Log in with the mobile number you shop with.</p>
+            {{with .Errors.form}}<div class="form-banner form-banner-error">{{.}}</div>{{end}}
+            <input type="hidden" name="next" value="{{.Next}}">
+            <label class="field">
+                <span>Mobile number</span>
+                <input name="phone" type="tel" value="{{.Values.phone}}" placeholder="03XX XXXXXXX" required autofocus>
+                {{with .Errors.phone}}<em class="field-error">{{.}}</em>{{end}}
+            </label>
+            <label class="field">
+                <span>Password</span>
+                <input name="password" type="password" required>
+            </label>
+            <button class="btn btn-primary btn-block" type="submit">Login</button>
+            <p class="auth-alt">New to TechPort? <a href="/register?next={{.Next}}">Create an account</a></p>
+        </form>
+    </div>
+</section>
+{{end}}

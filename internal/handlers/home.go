@@ -3,6 +3,7 @@ package handlers
 import (
 	"log/slog"
 	"net/http"
+	"strconv"
 
 	"github.com/KodeWorks-1/techport/internal/models"
 	"github.com/KodeWorks-1/techport/internal/services"
@@ -13,12 +14,19 @@ type homeSection struct {
 	Products []models.ProductCard
 }
 
+type jfyData struct {
+	Cards    []models.ProductCard
+	NextPage int
+	HasMore  bool
+}
+
 type homeData struct {
 	Categories []services.CategoryCard
 	Deals      []models.ProductCard
 	Popular    []models.ProductCard
 	Fresh      []models.ProductCard
 	Sections   []homeSection
+	JFY        jfyData
 }
 
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
@@ -49,9 +57,15 @@ func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
-	fresh, err := h.catalog.Latest(ctx, 8)
+	fresh, err := h.catalog.Latest(ctx, 4)
 	if err != nil {
 		slog.Error("home: latest", "err", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	jfyCards, jfyMore, err := h.catalog.JustForYou(ctx, 1, 12)
+	if err != nil {
+		slog.Error("home: jfy", "err", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
@@ -79,7 +93,23 @@ func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
 		Popular:    popular,
 		Fresh:      fresh,
 		Sections:   sections,
+		JFY:        jfyData{Cards: jfyCards, NextPage: 2, HasMore: jfyMore},
 	})
+}
+
+// JustForYou serves subsequent feed pages for the htmx load-more button.
+func (h *Handlers) JustForYou(w http.ResponseWriter, r *http.Request) {
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	if page < 2 {
+		page = 2
+	}
+	cards, hasMore, err := h.catalog.JustForYou(r.Context(), page, 12)
+	if err != nil {
+		slog.Error("jfy page", "err", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	h.renderer.RenderPartial(w, "jfy-tail", jfyData{Cards: cards, NextPage: page + 1, HasMore: hasMore})
 }
 
 type searchData struct {

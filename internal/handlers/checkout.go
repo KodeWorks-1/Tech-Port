@@ -31,6 +31,12 @@ func (h *Handlers) checkoutData(r *http.Request, values, errs map[string]string)
 	}
 	if values == nil {
 		values = map[string]string{"payment_method": "cod"}
+		if u, ok := h.currentUser(r); ok {
+			values["name"] = u.Name
+			values["phone"] = u.Phone
+			values["address"] = u.Address
+			values["city"] = u.City
+		}
 	}
 	return checkoutData{cartData: cd, Methods: methods, Values: values, Errors: errs}, nil
 }
@@ -118,6 +124,11 @@ func (h *Handlers) PlaceOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var userID *int64
+	user, loggedIn := h.currentUser(r)
+	if loggedIn {
+		userID = &user.ID
+	}
 	code, err := h.orders.Place(r.Context(), sessionID(r), services.PlaceOrderInput{
 		CustomerName:  values["name"],
 		Phone:         phone,
@@ -125,6 +136,7 @@ func (h *Handlers) PlaceOrder(w http.ResponseWriter, r *http.Request) {
 		City:          values["city"],
 		PaymentMethod: values["payment_method"],
 		Notes:         values["notes"],
+		UserID:        userID,
 	})
 	switch {
 	case errors.Is(err, services.ErrEmptyCart):
@@ -146,6 +158,11 @@ func (h *Handlers) PlaceOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if loggedIn {
+		if err := h.users.RememberAddress(r.Context(), user.ID, values["address"], values["city"]); err != nil {
+			slog.Warn("checkout: remember address", "err", err)
+		}
+	}
 	http.Redirect(w, r, "/order/"+code+"?placed=1", http.StatusSeeOther)
 }
 
@@ -217,7 +234,13 @@ func (h *Handlers) OrderPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if d.SessionID != sessionID(r) && normalizePhone(r.URL.Query().Get("phone")) != d.Phone {
+	allowed := d.SessionID == sessionID(r) || normalizePhone(r.URL.Query().Get("phone")) == d.Phone
+	if !allowed {
+		if u, ok := h.currentUser(r); ok && (u.Phone == d.Phone || (d.UserID != nil && *d.UserID == u.ID)) {
+			allowed = true
+		}
+	}
+	if !allowed {
 		h.renderer.Render(w, "track.html", trackData{
 			Code:  code,
 			Error: "Enter the phone number used for this order to view it.",

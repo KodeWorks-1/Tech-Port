@@ -1,0 +1,43 @@
+{{define "title"}}My Account — TechPort{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container container-narrow">
+        <div class="account-head">
+            <h1 class="page-title">My Account</h1>
+            <nav class="account-tabs">
+                <a class="tab-active" href="/account">Profile</a>
+                <a href="/account/orders">My Orders</a>
+            </nav>
+        </div>
+
+        {{if .Saved}}<div class="form-banner form-banner-success">Profile saved.</div>{{end}}
+
+        <form class="admin-panel" method="post" action="/account">
+            <label class="field">
+                <span>Full name</span>
+                <input name="name" value="{{.User.Name}}" required>
+                {{with .Errors.name}}<em class="field-error">{{.}}</em>{{end}}
+            </label>
+            <label class="field">
+                <span>Mobile number</span>
+                <input value="{{.User.Phone}}" disabled>
+                <small class="field-hint">Your login number can't be changed — contact us on WhatsApp if you need to.</small>
+            </label>
+            <label class="field">
+                <span>Email <small>(optional)</small></span>
+                <input name="email" type="email" value="{{.User.Email}}">
+            </label>
+            <label class="field">
+                <span>Default delivery address</span>
+                <textarea name="address" rows="3" placeholder="House / street / area">{{.User.Address}}</textarea>
+            </label>
+            <label class="field">
+                <span>City</span>
+                <input name="city" value="{{.User.City}}" placeholder="e.g. Lahore">
+            </label>
+            <button class="btn btn-primary" type="submit">Save profile</button>
+        </form>
+    </div>
+</section>
+{{end}}

@@ -1,0 +1,35 @@
+{{define "title"}}My Orders — TechPort{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container container-narrow">
+        <div class="account-head">
+            <h1 class="page-title">My Orders</h1>
+            <nav class="account-tabs">
+                <a href="/account">Profile</a>
+                <a class="tab-active" href="/account/orders">My Orders</a>
+            </nav>
+        </div>
+
+        {{if .Orders}}
+        <table class="admin-table admin-table-wide">
+            <tr><th>Order</th><th>Placed</th><th>Items</th><th>Total</th><th>Status</th></tr>
+            {{range .Orders}}
+            <tr>
+                <td><a href="/order/{{.Code}}">{{.Code}}</a></td>
+                <td>{{.CreatedAt.Format "2 Jan 2006"}}</td>
+                <td>{{.ItemCount}}</td>
+                <td>{{money .Total}}</td>
+                <td><span class="status-badge status-{{.Status}}">{{.Status}}</span></td>
+            </tr>
+            {{end}}
+        </table>
+        {{else}}
+        <div class="cart-empty">
+            <p>No orders yet — your orders will show up here.</p>
+            <a class="btn btn-primary" href="/">Start shopping</a>
+        </div>
+        {{end}}
+    </div>
+</section>
+{{end}}

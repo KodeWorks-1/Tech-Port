@@ -13,7 +13,18 @@
 </head>
 <body hx-boost="true">
 <div class="promo-bar">
-    <div class="container">Cash on Delivery Nationwide &nbsp;·&nbsp; <strong>FREE shipping on orders over Rs. 5,000!</strong> &nbsp;·&nbsp; 7-day easy returns</div>
+    <div class="container promo-row">
+        <span class="promo-msg">COD Nationwide · <strong>FREE shipping over Rs. 5,000!</strong></span>
+        <span class="promo-links">
+            <a href="/track">Track Order</a>
+            <span class="promo-sep">|</span>
+            {{with storePhone}}<a href="https://wa.me/{{.}}" target="_blank" rel="noopener">Help</a>
+            <span class="promo-sep">|</span>{{end}}
+            <span class="promo-account" hx-get="/account/menu" hx-trigger="load, acct-updated from:body" hx-swap="innerHTML">
+                <a href="/login">Login</a> <span class="promo-sep">|</span> <a href="/register">Sign Up</a>
+            </span>
+        </span>
+    </div>
 </div>
 
 <header class="site-header">
@@ -48,7 +59,7 @@
             {{range navCategories}}
             <a href="/c/{{.Slug}}">{{.Name}}</a>
             {{end}}
-            <a class="cat-nav-track" href="/track">Track Order</a>
+            <a class="cat-nav-track" href="/account/orders">My Orders</a>
         </div>
     </nav>
 </header>

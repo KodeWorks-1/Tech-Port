@@ -1,21 +1,40 @@
 {{define "content"}}
 <section class="banner-section">
-    <div class="container banner-grid">
-        <a class="banner banner-main" href="#deals">
-            <span class="banner-kicker">Launch offers</span>
-            <span class="banner-title">Genuine tech accessories<br>at Pakistan's best prices</span>
-            <span class="banner-sub">Keyboards · Mice · Cooling Pads · Laptop Backpacks</span>
-            <span class="btn btn-primary banner-cta">Shop deals</span>
-        </a>
-        <div class="banner-side">
-            <a class="banner banner-sm banner-blue" href="/c/backpacks">
-                <span class="banner-sm-title">Free shipping</span>
-                <span class="banner-sm-sub">on orders over Rs. 5,000</span>
-            </a>
-            <a class="banner banner-sm banner-dark" href="/warranty-returns">
-                <span class="banner-sm-title">7-day returns</span>
-                <span class="banner-sm-sub">no questions asked</span>
-            </a>
+    <div class="container hero-grid">
+        <aside class="side-cats">
+            {{range .Categories}}
+            <a href="/c/{{.Slug}}">{{.Name}}</a>
+            {{end}}
+            <a href="/track">Track Order</a>
+            <a href="/warranty-returns">Warranty &amp; Returns</a>
+        </aside>
+
+        <div class="hero-carousel" x-data="{i: 0, n: 3}" x-init="setInterval(() => i = (i + 1) % n, 4500)">
+            <div class="carousel-track" :style="`transform: translateX(-${i * 100}%)`">
+                <a class="banner banner-main slide" href="#deals">
+                    <span class="banner-kicker">Launch offers</span>
+                    <span class="banner-title">Genuine tech accessories<br>at Pakistan's best prices</span>
+                    <span class="banner-sub">Keyboards · Mice · Cooling Pads · Laptop Backpacks</span>
+                    <span class="btn btn-primary banner-cta">Shop deals</span>
+                </a>
+                <a class="banner banner-main slide slide-blue" href="/c/keyboards">
+                    <span class="banner-kicker">CoolBell official range</span>
+                    <span class="banner-title">Wireless keyboards<br>from Rs. 1,500</span>
+                    <span class="banner-sub">Bluetooth · Dual mode · Rechargeable</span>
+                    <span class="btn btn-primary banner-cta">Shop keyboards</span>
+                </a>
+                <a class="banner banner-main slide slide-green" href="/c/cooling-pads">
+                    <span class="banner-kicker">Beat the heat</span>
+                    <span class="banner-title">Laptop cooling pads<br>&amp; RGB stands</span>
+                    <span class="banner-sub">Cash on delivery · 7-day returns</span>
+                    <span class="btn btn-primary banner-cta">Shop cooling</span>
+                </a>
+            </div>
+            <div class="carousel-dots">
+                <button :class="i===0 && 'dot-active'" @click="i=0" aria-label="Slide 1"></button>
+                <button :class="i===1 && 'dot-active'" @click="i=1" aria-label="Slide 2"></button>
+                <button :class="i===2 && 'dot-active'" @click="i=2" aria-label="Slide 3"></button>
+            </div>
         </div>
     </div>
 </section>
@@ -90,4 +109,15 @@
     </div>
 </section>
 {{end}}
+
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <h2 class="section-title">Just For You</h2>
+        </div>
+        <div class="product-grid">
+            {{template "jfy-tail" .JFY}}
+        </div>
+    </div>
+</section>
 {{end}}

@@ -13,6 +13,7 @@ type Handlers struct {
 	catalog   *services.Catalog
 	cart      *services.Cart
 	orders    *services.Orders
+	users     *services.Users
 	settings  *services.Settings
 	admin     *services.Admin
 	adminAuth *services.AdminAuth
@@ -20,10 +21,10 @@ type Handlers struct {
 }
 
 func New(catalog *services.Catalog, cart *services.Cart, orders *services.Orders,
-	settings *services.Settings, admin *services.Admin, adminAuth *services.AdminAuth,
-	renderer *Renderer) *Handlers {
-	return &Handlers{catalog: catalog, cart: cart, orders: orders, settings: settings,
-		admin: admin, adminAuth: adminAuth, renderer: renderer}
+	users *services.Users, settings *services.Settings, admin *services.Admin,
+	adminAuth *services.AdminAuth, renderer *Renderer) *Handlers {
+	return &Handlers{catalog: catalog, cart: cart, orders: orders, users: users,
+		settings: settings, admin: admin, adminAuth: adminAuth, renderer: renderer}
 }
 
 func (h *Handlers) Router() http.Handler {
@@ -47,9 +48,23 @@ func (h *Handlers) Router() http.Handler {
 		r.Use(h.session)
 
 		r.Get("/", h.Home)
+		r.Get("/jfy", h.JustForYou)
 		r.Get("/search", h.Search)
 		r.Get("/c/{slug}", h.Category)
 		r.Get("/p/{slug}", h.Product)
+
+		r.Get("/login", h.LoginPage)
+		r.Post("/login", h.Login)
+		r.Get("/register", h.RegisterPage)
+		r.Post("/register", h.Register)
+		r.Post("/logout", h.Logout)
+		r.Get("/account/menu", h.AccountMenu)
+		r.Group(func(r chi.Router) {
+			r.Use(h.requireUser)
+			r.Get("/account", h.AccountPage)
+			r.Post("/account", h.AccountSave)
+			r.Get("/account/orders", h.MyOrders)
+		})
 
 		r.Get("/cart", h.CartPage)
 		r.Get("/cart/count", h.CartCount)
