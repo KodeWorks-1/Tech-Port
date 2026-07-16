@@ -30,7 +30,17 @@ func Load() Config {
 	}
 }
 
-func (c Config) Dev() bool { return c.Env == "dev" }
+// Dev reports whether to use disk templates/statics with live reload.
+// Requires the views directory to actually exist on disk, so a binary
+// deployed without the repo (Vercel) always uses its embedded assets even
+// if ENV is unset.
+func (c Config) Dev() bool {
+	if c.Env != "dev" {
+		return false
+	}
+	_, err := os.Stat("views")
+	return err == nil
+}
 
 func getenv(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {

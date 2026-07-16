@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"fmt"
+	"hash/crc32"
 	"html/template"
+	"io/fs"
 	"log/slog"
 	"net/http"
 	"os"
@@ -10,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	assets "github.com/KodeWorks-1/techport"
 )
 
 var tmplFuncs = template.FuncMap{
@@ -28,13 +32,13 @@ var tmplFuncs = template.FuncMap{
 		}
 		return int((1 - price / *compare) * 100)
 	},
-	// assetVer busts browser/CDN caches when the stylesheet changes.
+	// assetVer busts browser/CDN caches when the stylesheet changes. Falls
+	// back to a checksum of the embedded stylesheet when there is no disk.
 	"assetVer": func() int64 {
-		fi, err := os.Stat(filepath.Join("static", "css", "app.css"))
-		if err != nil {
-			return 0
+		if fi, err := os.Stat(filepath.Join("static", "css", "app.css")); err == nil {
+			return fi.ModTime().Unix()
 		}
-		return fi.ModTime().Unix()
+		return embeddedCSSVer
 	},
 	// money renders "Rs. 3,000" from a float rupee amount.
 	"money": func(v float64) string {
@@ -84,13 +88,21 @@ func NewRenderer(dev bool, extra template.FuncMap) *Renderer {
 	return &Renderer{dev: dev, funcs: funcs, cache: map[string]*template.Template{}}
 }
 
+var embeddedCSSVer = func() int64 {
+	b, err := fs.ReadFile(assets.FS, "static/css/app.css")
+	if err != nil {
+		return 0
+	}
+	return int64(crc32.ChecksumIEEE(b))
+}()
+
 // layoutFor picks the storefront or admin layout by page path
 // ("admin/x.html" lives in views/admin/, everything else in views/pages/).
 func layoutFor(page string) (layoutFile, pageFile string) {
 	if rest, ok := strings.CutPrefix(page, "admin/"); ok {
-		return "admin-layout.html", filepath.Join("views", "admin", rest)
+		return "admin-layout.html", "views/admin/" + rest
 	}
-	return "layout.html", filepath.Join("views", "pages", page)
+	return "layout.html", "views/pages/" + page
 }
 
 func (r *Renderer) load(page string) (*template.Template, error) {
@@ -102,12 +114,23 @@ func (r *Renderer) load(page string) (*template.Template, error) {
 		}
 	}
 	layout, pageFile := layoutFor(page)
-	files := []string{filepath.Join("views", layout)}
-	partials, _ := filepath.Glob(filepath.Join("views", "partials", "*.html"))
-	files = append(files, partials...)
-	files = append(files, pageFile)
 
-	t, err := template.New(layout).Funcs(r.funcs).ParseFiles(files...)
+	var t *template.Template
+	var err error
+	if r.dev {
+		// disk parse for live template reload
+		files := []string{"views/" + layout}
+		partials, _ := filepath.Glob(filepath.Join("views", "partials", "*.html"))
+		files = append(files, partials...)
+		files = append(files, pageFile)
+		t, err = template.New(layout).Funcs(r.funcs).ParseFiles(files...)
+	} else {
+		files := []string{"views/" + layout}
+		partials, _ := fs.Glob(assets.FS, "views/partials/*.html")
+		files = append(files, partials...)
+		files = append(files, pageFile)
+		t, err = template.New(layout).Funcs(r.funcs).ParseFS(assets.FS, files...)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("parse %s: %w", page, err)
 	}

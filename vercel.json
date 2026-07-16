@@ -1,13 +1,17 @@
 {
-  "functions": {
-    "api/index.go": {
-      "includeFiles": "{views,static}/**"
+  "services": {
+    "techport": {
+      "root": ".",
+      "entrypoint": "cmd/server/main.go"
     }
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index" }
-  ],
-  "env": {
-    "ENV": "production"
-  }
+    {
+      "source": "/(.*)",
+      "destination": {
+        "type": "service",
+        "service": "techport"
+      }
+    }
+  ]
 }

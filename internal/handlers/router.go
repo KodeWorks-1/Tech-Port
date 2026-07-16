@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"io/fs"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	assets "github.com/KodeWorks-1/techport"
 	"github.com/KodeWorks-1/techport/internal/services"
 )
 
@@ -34,8 +36,14 @@ func (h *Handlers) Router() http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Compress(5))
 
-	fs := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
-	r.Handle("/static/*", h.cacheStatic(fs))
+	var staticRoot http.FileSystem = http.Dir("static")
+	if !h.renderer.dev {
+		if sub, err := fs.Sub(assets.FS, "static"); err == nil {
+			staticRoot = http.FS(sub)
+		}
+	}
+	staticSrv := http.StripPrefix("/static/", http.FileServer(staticRoot))
+	r.Handle("/static/*", h.cacheStatic(staticSrv))
 	uploads := http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads")))
 	r.Handle("/uploads/*", h.cacheStatic(uploads))
 
