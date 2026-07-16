@@ -1,0 +1,23 @@
+# One-click demo deploy on Render's free tier.
+# In Render: New + > Blueprint > pick this repo > Apply.
+# Free web services sleep after ~15 min idle (first hit takes ~50s to wake);
+# the free Postgres instance expires after 30 days — fine for demos.
+services:
+  - type: web
+    name: techport
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: techport-db
+          property: connectionString
+
+databases:
+  - name: techport-db
+    plan: free
+    databaseName: techport
+    user: techport

@@ -6,6 +6,7 @@
     <title>{{block "title" .}}TechPort — Tech Accessories Store in Pakistan{{end}}</title>
     <meta name="description" content="{{block "meta_description" .}}Genuine tech accessories with cash on delivery across Pakistan — keyboards, mice, audio, chargers and more.{{end}}">
     <meta name="htmx-config" content='{"responseHandling": [{"code":".*", "swap": true}]}'>
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
     <link rel="stylesheet" href="/static/css/app.css?v={{assetVer}}">
     <script src="/static/js/htmx.min.js" defer></script>
     <script src="/static/js/alpine.min.js" defer></script>
@@ -29,7 +30,7 @@
 
 <header class="site-header">
     <div class="container header-row">
-        <a class="logo" href="/">Tech<span>Port</span></a>
+        <a class="logo" href="/"><img src="/static/img/logo.png" alt="TechPort logo" width="40" height="40">Tech<span>Port</span></a>
 
         <form class="search-form" action="/search" method="get">
             <input type="search" name="q" placeholder="Search for products…" aria-label="Search products" minlength="2" required>

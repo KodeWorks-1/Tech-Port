@@ -23,6 +23,18 @@ before going live**). Manages orders (status flow with automatic restock on
 cancel/return), products, variants, images, categories, and store settings
 (shipping fee, WhatsApp number, payment method visibility).
 
+## Free demo hosting (Render)
+
+`render.yaml` is a ready Render blueprint: create a free account at
+render.com, **New + → Blueprint**, pick this GitHub repo, Apply. It builds
+the Dockerfile, provisions a free Postgres, and the app migrates + seeds
+the real catalog on first boot. You get a public
+`https://techport-xxxx.onrender.com` URL to share with the client.
+
+Free-tier caveats: the service sleeps after ~15 min idle (first request
+takes ~50 s to wake — open it before the demo), uploads don't persist
+across restarts, and the free database expires after 30 days.
+
 ## Deploy (Contabo SG or any Docker host)
 
 ```sh

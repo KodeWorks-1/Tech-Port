@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
     <title>{{block "title" .}}Admin — TechPort{{end}}</title>
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
     <link rel="stylesheet" href="/static/css/app.css?v={{assetVer}}">
 </head>
 <body class="admin-body">
-<header class="site-header admin-header">
+<header class="admin-header">
     <div class="container header-row">
-        <a class="logo" href="/admin">Tech<span>Port</span> <em class="admin-tag">admin</em></a>
-        <nav class="main-nav admin-nav">
+        <a class="logo logo-light" href="/admin"><img src="/static/img/logo.png" alt="TechPort logo" width="36" height="36">Tech<span>Port</span> <em class="admin-tag">admin</em></a>
+        <nav class="admin-nav">
             <a href="/admin">Dashboard</a>
             <a href="/admin/orders">Orders</a>
             <a href="/admin/products">Products</a>
