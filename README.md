@@ -18,7 +18,7 @@ demo products so the store is browsable immediately.
 
 ## Admin
 
-`/admin` — first run seeds `admin@techport.pk` / `changeme123` (**change this
+`/admin` — first run seeds ID `admin` / password `admin123` (**change this
 before going live**). Manages orders (status flow with automatic restock on
 cancel/return), products, variants, images, categories, and store settings
 (shipping fee, WhatsApp number, payment method visibility).

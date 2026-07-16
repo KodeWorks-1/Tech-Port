@@ -48,16 +48,16 @@ func seedAdmin(ctx context.Context, pool *pgxpool.Pool) error {
 	if n > 0 {
 		return nil
 	}
-	hash, err := bcrypt.GenerateFromPassword([]byte("changeme123"), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 	if _, err := pool.Exec(ctx,
 		`INSERT INTO admin_users (email, password_hash) VALUES ($1, $2)`,
-		"admin@techport.pk", string(hash)); err != nil {
+		"admin", string(hash)); err != nil {
 		return err
 	}
-	slog.Warn("seeded default admin", "email", "admin@techport.pk", "password", "changeme123")
+	slog.Warn("seeded default admin", "id", "admin", "password", "admin123")
 	return nil
 }
 
