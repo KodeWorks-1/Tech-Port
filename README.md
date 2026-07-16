@@ -23,6 +23,21 @@ before going live**). Manages orders (status flow with automatic restock on
 cancel/return), products, variants, images, categories, and store settings
 (shipping fee, WhatsApp number, payment method visibility).
 
+## Free demo hosting (Vercel)
+
+The repo is Vercel-ready: `api/index.go` wraps the whole router as one
+serverless function and `vercel.json` rewrites every path to it.
+
+1. vercel.com → sign in with GitHub → **Add New… → Project** → import
+   `Tech-Port` → Deploy (no framework preset needed — it detects Go).
+2. Project → **Storage → Create Database → Neon (Postgres, free)** →
+   connect it to the project (this injects `DATABASE_URL`).
+3. **Redeploy**. First request runs migrations and seeds the catalog.
+
+Caveats: admin image uploads don't work on Vercel (read-only filesystem);
+cold starts are ~1s. Catalog images ship inside the function, so the
+store itself is fully functional.
+
 ## Free demo hosting (Render)
 
 `render.yaml` is a ready Render blueprint: create a free account at

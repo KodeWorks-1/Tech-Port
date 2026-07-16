@@ -16,10 +16,17 @@ type Config struct {
 // config from environment variables with dev-friendly defaults.
 func Load() Config {
 	loadDotEnv(".env")
+	dbURL := getenv("DATABASE_URL", "")
+	if dbURL == "" {
+		dbURL = getenv("POSTGRES_URL", "") // Vercel/Neon integration name
+	}
+	if dbURL == "" {
+		dbURL = "postgres://techport:techport@localhost:5543/techport?sslmode=disable"
+	}
 	return Config{
 		Env:         getenv("ENV", "dev"),
 		Port:        getenv("PORT", "8080"),
-		DatabaseURL: getenv("DATABASE_URL", "postgres://techport:techport@localhost:5543/techport?sslmode=disable"),
+		DatabaseURL: dbURL,
 	}
 }
 

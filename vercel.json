@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/index.go": {
+      "includeFiles": "{views,static}/**"
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index" }
+  ],
+  "env": {
+    "ENV": "production"
+  }
+}
