@@ -8,6 +8,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -21,14 +22,40 @@ import (
 
 /* ---------- product list + form ---------- */
 
+type adminProductsData struct {
+	Products []services.AdminProductRow
+	Search   string
+}
+
 func (h *Handlers) AdminProducts(w http.ResponseWriter, r *http.Request) {
-	products, err := h.admin.Products(r.Context())
+	search := r.URL.Query().Get("q")
+	products, err := h.admin.Products(r.Context(), search)
 	if err != nil {
 		slog.Error("admin products", "err", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
-	h.renderer.Render(w, "admin/products.html", struct{ Products []services.AdminProductRow }{products})
+	h.renderer.Render(w, "admin/products.html", adminProductsData{Products: products, Search: search})
+}
+
+// AdminProductToggle flips active/featured from the product list.
+func (h *Handlers) AdminProductToggle(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if err := h.admin.ToggleProduct(r.Context(), id, r.FormValue("field")); err != nil &&
+		!errors.Is(err, services.ErrNotFound) {
+		slog.Error("admin product toggle", "err", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	back := "/admin/products"
+	if q := r.FormValue("q"); q != "" {
+		back += "?q=" + url.QueryEscape(q)
+	}
+	http.Redirect(w, r, back, http.StatusSeeOther)
 }
 
 type adminProductFormData struct {

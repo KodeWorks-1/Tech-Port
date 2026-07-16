@@ -20,6 +20,23 @@
     </div>
 </section>
 
+{{if .Deals}}
+<section class="section" id="deals">
+    <div class="container">
+        <div class="flash-panel">
+            <div class="flash-head">
+                <h2 class="flash-title">⚡ Flash Deals</h2>
+                <span class="flash-sub">Limited-time launch prices</span>
+                <a class="btn btn-outline flash-more" href="/search?q=coolbell">Shop more</a>
+            </div>
+            <div class="deal-strip">
+                {{range .Deals}}{{template "product-card" .}}{{end}}
+            </div>
+        </div>
+    </div>
+</section>
+{{end}}
+
 <section class="section" id="categories">
     <div class="container">
         <h2 class="section-title">Shop by category</h2>
@@ -34,16 +51,18 @@
     </div>
 </section>
 
-<section class="section" id="deals">
+{{if .Popular}}
+<section class="section">
     <div class="container">
         <div class="section-head">
-            <h2 class="section-title">🔥 Hot deals</h2>
+            <h2 class="section-title">Popular right now</h2>
         </div>
         <div class="product-grid">
-            {{range .Featured}}{{template "product-card" .}}{{end}}
+            {{range .Popular}}{{template "product-card" .}}{{end}}
         </div>
     </div>
 </section>
+{{end}}
 
 {{range .Sections}}
 <section class="section">
@@ -54,6 +73,19 @@
         </div>
         <div class="product-grid">
             {{range .Products}}{{template "product-card" .}}{{end}}
+        </div>
+    </div>
+</section>
+{{end}}
+
+{{if .Fresh}}
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <h2 class="section-title">New arrivals</h2>
+        </div>
+        <div class="product-grid">
+            {{range .Fresh}}{{template "product-card" .}}{{end}}
         </div>
     </div>
 </section>

@@ -11,7 +11,8 @@
   "images": [
    "/static/img/products/coolbell-cb-900-cooling-pad-for-14-17-inch-laptops-gaming-notebook-1.jpg"
   ],
-  "daraz_item_id": "1960164922"
+  "daraz_item_id": "1960164922",
+  "compare_at": 3999
  },
  {
   "slug": "coolbell-swift-sense-pro-wb-m100-mouse",
@@ -25,7 +26,8 @@
   "images": [
    "/static/img/products/coolbell-swift-sense-pro-wb-m100-mouse-1.webp"
   ],
-  "daraz_item_id": "1960254394"
+  "daraz_item_id": "1960254394",
+  "compare_at": 2650
  },
  {
   "slug": "coolbell-smart-board-bt-kb02-bluetooth-wireless-keyboard-with-touchpad",
@@ -39,7 +41,8 @@
   "images": [
    "/static/img/products/coolbell-smart-board-bt-kb02-bluetooth-wireless-keyboard-with-touchpad-1.jpg"
   ],
-  "daraz_item_id": "1959675582"
+  "daraz_item_id": "1959675582",
+  "compare_at": 3499
  },
  {
   "slug": "coolbell-slider-usb-mouse-for-precision-and-comfort",
@@ -193,7 +196,8 @@
   "images": [
    "/static/img/products/coolbell-mkb-01-magic-wireless-keyboard-sleek-silent-and-multi-device-1.webp"
   ],
-  "daraz_item_id": "1964058437"
+  "daraz_item_id": "1964058437",
+  "compare_at": 7200
  },
  {
   "slug": "coolbell-keymax-wbk-01-dual-mode-wireless-keyboard",

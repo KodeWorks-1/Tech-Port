@@ -71,6 +71,26 @@ func (c *Catalog) Latest(ctx context.Context, limit int) ([]models.ProductCard, 
 	return c.cards(ctx, productCardQuery+` ORDER BY p.created_at DESC LIMIT $1`, limit)
 }
 
+// Popular ranks products by actual order volume, falling back to featured
+// and newest so the section works before any orders exist.
+func (c *Catalog) Popular(ctx context.Context, limit int) ([]models.ProductCard, error) {
+	return c.cards(ctx, productCardQuery+`
+		ORDER BY (SELECT COALESCE(SUM(oi.qty), 0)
+		          FROM order_items oi
+		          JOIN product_variants v ON v.id = oi.variant_id
+		          WHERE v.product_id = p.id) DESC,
+		         p.featured DESC, p.created_at DESC
+		LIMIT $1`, limit)
+}
+
+// Deals returns discounted products, biggest discount first.
+func (c *Catalog) Deals(ctx context.Context, limit int) ([]models.ProductCard, error) {
+	return c.cards(ctx, productCardQuery+`
+		AND p.compare_at_price IS NOT NULL AND p.compare_at_price > p.base_price
+		ORDER BY (1 - p.base_price / p.compare_at_price) DESC, p.featured DESC
+		LIMIT $1`, limit)
+}
+
 // Search matches title, brand, and description case-insensitively.
 func (c *Catalog) Search(ctx context.Context, q string, limit int) ([]models.ProductCard, error) {
 	pat := "%" + strings.ReplaceAll(strings.ReplaceAll(q, "%", `\%`), "_", `\_`) + "%"

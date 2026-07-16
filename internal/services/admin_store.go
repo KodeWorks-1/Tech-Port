@@ -91,16 +91,22 @@ type AdminOrderRow struct {
 	CreatedAt    time.Time
 }
 
-func (a *Admin) Orders(ctx context.Context, status string, limit int) ([]AdminOrderRow, error) {
+func (a *Admin) Orders(ctx context.Context, status, search string, limit int) ([]AdminOrderRow, error) {
 	q := `
 		SELECT o.id, o.code, o.customer_name, o.phone, o.city, o.status, o.total,
 		       (SELECT COALESCE(SUM(qty),0) FROM order_items WHERE order_id=o.id),
 		       o.created_at
-		FROM orders o`
+		FROM orders o
+		WHERE TRUE`
 	args := []any{}
 	if status != "" {
-		q += ` WHERE o.status = $1`
 		args = append(args, status)
+		q += fmt.Sprintf(` AND o.status = $%d`, len(args))
+	}
+	if search != "" {
+		args = append(args, "%"+search+"%")
+		q += fmt.Sprintf(` AND (o.code ILIKE $%d OR o.phone ILIKE $%d OR o.customer_name ILIKE $%d)`,
+			len(args), len(args), len(args))
 	}
 	q += fmt.Sprintf(` ORDER BY o.created_at DESC LIMIT %d`, limit)
 
@@ -190,15 +196,29 @@ type AdminProductRow struct {
 	Stock        int
 	Active       bool
 	Featured     bool
+	Image        string
+	Sold         int
 }
 
-func (a *Admin) Products(ctx context.Context) ([]AdminProductRow, error) {
-	rows, err := a.pool.Query(ctx, `
+func (a *Admin) Products(ctx context.Context, search string) ([]AdminProductRow, error) {
+	q := `
 		SELECT p.id, p.slug, p.title, c.name, p.base_price,
 		       COALESCE((SELECT SUM(stock) FROM product_variants WHERE product_id=p.id), 0),
-		       p.active, p.featured
-		FROM products p JOIN categories c ON c.id = p.category_id
-		ORDER BY p.created_at DESC`)
+		       p.active, p.featured,
+		       COALESCE((SELECT i.path FROM product_images i
+		                 WHERE i.product_id=p.id ORDER BY i.sort LIMIT 1), ''),
+		       COALESCE((SELECT SUM(oi.qty) FROM order_items oi
+		                 JOIN product_variants v ON v.id = oi.variant_id
+		                 WHERE v.product_id = p.id), 0)
+		FROM products p JOIN categories c ON c.id = p.category_id`
+	args := []any{}
+	if search != "" {
+		q += ` WHERE p.title ILIKE $1 OR p.brand ILIKE $1 OR c.name ILIKE $1`
+		args = append(args, "%"+search+"%")
+	}
+	q += ` ORDER BY p.created_at DESC`
+
+	rows, err := a.pool.Query(ctx, q, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -207,12 +227,33 @@ func (a *Admin) Products(ctx context.Context) ([]AdminProductRow, error) {
 	for rows.Next() {
 		var r AdminProductRow
 		if err := rows.Scan(&r.ID, &r.Slug, &r.Title, &r.CategoryName, &r.BasePrice,
-			&r.Stock, &r.Active, &r.Featured); err != nil {
+			&r.Stock, &r.Active, &r.Featured, &r.Image, &r.Sold); err != nil {
 			return nil, err
 		}
 		out = append(out, r)
 	}
 	return out, rows.Err()
+}
+
+// ToggleProduct flips a boolean product flag ("active" or "featured").
+func (a *Admin) ToggleProduct(ctx context.Context, id int64, field string) error {
+	var q string
+	switch field {
+	case "active":
+		q = `UPDATE products SET active = NOT active, updated_at = now() WHERE id=$1`
+	case "featured":
+		q = `UPDATE products SET featured = NOT featured, updated_at = now() WHERE id=$1`
+	default:
+		return fmt.Errorf("invalid toggle field %q", field)
+	}
+	tag, err := a.pool.Exec(ctx, q, id)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 // ProductByID loads a product for editing (including inactive ones).

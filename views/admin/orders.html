@@ -5,11 +5,16 @@
     <div class="container">
         <div class="listing-head">
             <h1 class="page-title">Orders</h1>
+            <form class="admin-search" method="get" action="/admin/orders">
+                <input type="search" name="q" value="{{.Search}}" placeholder="Search code / phone / name…">
+                {{with .Filter}}<input type="hidden" name="status" value="{{.}}">{{end}}
+            </form>
             <select class="sort-select" onchange="location.href=this.value">
-                <option value="/admin/orders" {{if eq .Filter ""}}selected{{end}}>All statuses</option>
+                {{$q := .Search}}
+                <option value="/admin/orders?q={{$q}}" {{if eq .Filter ""}}selected{{end}}>All statuses</option>
                 {{$f := .Filter}}
                 {{range .Statuses}}
-                <option value="/admin/orders?status={{.}}" {{if eq $f .}}selected{{end}}>{{.}}</option>
+                <option value="/admin/orders?status={{.}}&q={{$q}}" {{if eq $f .}}selected{{end}}>{{.}}</option>
                 {{end}}
             </select>
         </div>

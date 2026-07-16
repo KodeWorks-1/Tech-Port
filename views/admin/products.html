@@ -5,25 +5,46 @@
     <div class="container">
         <div class="listing-head">
             <h1 class="page-title">Products</h1>
+            <form class="admin-search" method="get" action="/admin/products">
+                <input type="search" name="q" value="{{.Search}}" placeholder="Search products…">
+            </form>
             <a class="btn btn-primary" href="/admin/products/new">+ Add product</a>
         </div>
 
+        {{if .Products}}
         <table class="admin-table admin-table-wide">
-            <tr><th>Title</th><th>Category</th><th>Price</th><th>Stock</th><th>Flags</th><th></th></tr>
+            <tr><th></th><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Sold</th><th>Status</th><th class="th-actions">Actions</th></tr>
+            {{$q := .Search}}
             {{range .Products}}
             <tr class="{{if not .Active}}row-inactive{{end}}">
+                <td class="td-thumb">{{if .Image}}<img class="thumb-sm" src="{{.Image}}" alt="" loading="lazy" width="44" height="44">{{end}}</td>
                 <td><a href="/admin/products/{{.ID}}">{{.Title}}</a></td>
                 <td>{{.CategoryName}}</td>
                 <td>{{money .BasePrice}}</td>
                 <td class="{{if eq .Stock 0}}stock-zero{{end}}">{{.Stock}}</td>
+                <td>{{.Sold}}</td>
                 <td>
-                    {{if not .Active}}<span class="status-badge status-cancelled">hidden</span>{{end}}
+                    {{if .Active}}<span class="status-badge status-delivered">live</span>
+                    {{else}}<span class="status-badge status-cancelled">hidden</span>{{end}}
                     {{if .Featured}}<span class="status-badge status-confirmed">featured</span>{{end}}
                 </td>
-                <td><a class="table-link" href="/p/{{.Slug}}" target="_blank">view ↗</a></td>
+                <td class="actions-cell">
+                    <form method="post" action="/admin/products/{{.ID}}/toggle">
+                        <input type="hidden" name="field" value="active">
+                        <input type="hidden" name="q" value="{{$q}}">
+                        <button class="btn btn-outline btn-xs" type="submit">{{if .Active}}Hide{{else}}Show{{end}}</button>
+                    </form>
+                    <form method="post" action="/admin/products/{{.ID}}/toggle">
+                        <input type="hidden" name="field" value="featured">
+                        <input type="hidden" name="q" value="{{$q}}">
+                        <button class="btn btn-outline btn-xs" type="submit" title="{{if .Featured}}Remove from featured{{else}}Add to featured{{end}}">{{if .Featured}}★{{else}}☆{{end}}</button>
+                    </form>
+                    <a class="table-link" href="/p/{{.Slug}}" target="_blank">view ↗</a>
+                </td>
             </tr>
             {{end}}
         </table>
+        {{else}}<p class="empty-note">No products{{with .Search}} matching "{{.}}"{{end}}.</p>{{end}}
     </div>
 </section>
 {{end}}

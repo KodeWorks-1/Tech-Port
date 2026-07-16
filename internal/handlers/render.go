@@ -21,6 +21,13 @@ var tmplFuncs = template.FuncMap{
 		}
 		return *v
 	},
+	// pct renders the discount percentage for a compare-at price.
+	"pct": func(price float64, compare *float64) int {
+		if compare == nil || *compare <= price || *compare == 0 {
+			return 0
+		}
+		return int((1 - price / *compare) * 100)
+	},
 	// assetVer busts browser/CDN caches when the stylesheet changes.
 	"assetVer": func() int64 {
 		fi, err := os.Stat(filepath.Join("static", "css", "app.css"))

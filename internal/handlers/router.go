@@ -83,6 +83,7 @@ func (h *Handlers) Router() http.Handler {
 			r.Post("/orders/{id}/status", h.AdminOrderStatus)
 
 			r.Get("/products", h.AdminProducts)
+			r.Post("/products/{id}/toggle", h.AdminProductToggle)
 			r.Get("/products/new", h.AdminProductNew)
 			r.Post("/products", h.AdminProductCreate)
 			r.Get("/products/{id}", h.AdminProductEdit)

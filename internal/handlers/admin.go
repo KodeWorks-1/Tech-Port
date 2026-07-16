@@ -104,7 +104,7 @@ func (h *Handlers) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
-	recent, err := h.admin.Orders(ctx, "", 10)
+	recent, err := h.admin.Orders(ctx, "", "", 10)
 	if err != nil {
 		slog.Error("admin dashboard: recent", "err", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
@@ -120,19 +120,21 @@ func (h *Handlers) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 type adminOrdersData struct {
 	Orders   []services.AdminOrderRow
 	Filter   string
+	Search   string
 	Statuses []string
 }
 
 func (h *Handlers) AdminOrders(w http.ResponseWriter, r *http.Request) {
 	filter := r.URL.Query().Get("status")
-	orders, err := h.admin.Orders(r.Context(), filter, 200)
+	search := r.URL.Query().Get("q")
+	orders, err := h.admin.Orders(r.Context(), filter, search, 200)
 	if err != nil {
 		slog.Error("admin orders", "err", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
 	h.renderer.Render(w, "admin/orders.html", adminOrdersData{
-		Orders: orders, Filter: filter, Statuses: services.ValidOrderStatuses,
+		Orders: orders, Filter: filter, Search: search, Statuses: services.ValidOrderStatuses,
 	})
 }
 

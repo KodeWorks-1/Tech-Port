@@ -3,7 +3,7 @@
     <a class="card-link" href="/p/{{.Slug}}">
         <div class="card-media">
             <img src="{{.Image}}" alt="{{.Title}}" loading="lazy" width="400" height="400">
-            {{if .CompareAtPrice}}<span class="badge badge-sale">Sale</span>{{end}}
+            {{if .CompareAtPrice}}<span class="badge badge-sale">-{{pct .Price .CompareAtPrice}}%</span>{{end}}
             {{if not .InStock}}<span class="badge badge-oos">Out of stock</span>{{end}}
         </div>
         <div class="card-body">

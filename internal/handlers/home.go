@@ -15,7 +15,9 @@ type homeSection struct {
 
 type homeData struct {
 	Categories []services.CategoryCard
-	Featured   []models.ProductCard
+	Deals      []models.ProductCard
+	Popular    []models.ProductCard
+	Fresh      []models.ProductCard
 	Sections   []homeSection
 }
 
@@ -28,9 +30,28 @@ func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
-	featured, err := h.catalog.Featured(ctx, 4)
+	deals, err := h.catalog.Deals(ctx, 8)
 	if err != nil {
-		slog.Error("home: featured", "err", err)
+		slog.Error("home: deals", "err", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	if len(deals) == 0 {
+		if deals, err = h.catalog.Featured(ctx, 8); err != nil {
+			slog.Error("home: featured fallback", "err", err)
+			http.Error(w, "internal error", http.StatusInternalServerError)
+			return
+		}
+	}
+	popular, err := h.catalog.Popular(ctx, 4)
+	if err != nil {
+		slog.Error("home: popular", "err", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	fresh, err := h.catalog.Latest(ctx, 8)
+	if err != nil {
+		slog.Error("home: latest", "err", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
@@ -54,7 +75,9 @@ func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
 
 	h.renderer.Render(w, "home.html", homeData{
 		Categories: categories,
-		Featured:   featured,
+		Deals:      deals,
+		Popular:    popular,
+		Fresh:      fresh,
 		Sections:   sections,
 	})
 }

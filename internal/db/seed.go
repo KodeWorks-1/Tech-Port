@@ -32,6 +32,7 @@ type catalogProduct struct {
 	Category    string   `json:"category"`
 	Description string   `json:"description"`
 	Price       float64  `json:"price"`
+	CompareAt   *float64 `json:"compare_at"`
 	Featured    bool     `json:"featured"`
 	Stock       int      `json:"stock"`
 	Images      []string `json:"images"`
@@ -99,11 +100,11 @@ func SeedIfEmpty(ctx context.Context, pool *pgxpool.Pool) error {
 		}
 		var productID int64
 		if err := pool.QueryRow(ctx, `
-			INSERT INTO products (slug, title, brand, category_id, description, specs, base_price, featured)
-			VALUES ($1,$2,$3,$4,$5,'{}',$6,$7)
+			INSERT INTO products (slug, title, brand, category_id, description, specs, base_price, compare_at_price, featured)
+			VALUES ($1,$2,$3,$4,$5,'{}',$6,$7,$8)
 			ON CONFLICT (slug) DO NOTHING
 			RETURNING id`,
-			p.Slug, p.Title, p.Brand, catID, p.Description, p.Price, p.Featured,
+			p.Slug, p.Title, p.Brand, catID, p.Description, p.Price, p.CompareAt, p.Featured,
 		).Scan(&productID); err != nil {
 			return fmt.Errorf("seed product %s: %w", p.Slug, err)
 		}
