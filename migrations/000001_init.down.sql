@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS admin_users;
+DROP TABLE IF EXISTS order_events;
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS cart_items;
+DROP TABLE IF EXISTS carts;
+DROP TABLE IF EXISTS product_images;
+DROP TABLE IF EXISTS product_variants;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS categories;

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{block "title" .}}TechPort — Tech Accessories Store in Pakistan{{end}}</title>
+    <meta name="description" content="{{block "meta_description" .}}Genuine tech accessories with cash on delivery across Pakistan — keyboards, mice, audio, chargers and more.{{end}}">
+    <link rel="stylesheet" href="/static/css/app.css">
+    <script src="/static/js/htmx.min.js" defer></script>
+    <script src="/static/js/alpine.min.js" defer></script>
+</head>
+<body hx-boost="true">
+<header class="site-header">
+    <div class="container header-row">
+        <a class="logo" href="/">Tech<span>Port</span></a>
+        <nav class="main-nav">
+            <a href="/">Home</a>
+            <a href="/#categories">Categories</a>
+            <a href="/#featured">Deals</a>
+        </nav>
+        <a class="cart-btn" href="/cart" aria-label="Cart">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="cart-count" id="cart-count">0</span>
+        </a>
+    </div>
+</header>
+
+<main>
+{{block "content" .}}{{end}}
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="trust-row">
+            <div class="trust-item"><strong>Cash on Delivery</strong><span>Pay when it arrives</span></div>
+            <div class="trust-item"><strong>Nationwide Delivery</strong><span>All major cities, 2–5 days</span></div>
+            <div class="trust-item"><strong>7-Day Returns</strong><span>Easy replacement policy</span></div>
+            <div class="trust-item"><strong>WhatsApp Support</strong><span>Order help on WhatsApp</span></div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 TechPort — Tech accessories, delivered across Pakistan.</p>
+            <p class="footer-links"><a href="/">Home</a> · <a href="https://www.daraz.pk/shop/ge49t4yv/" rel="noopener" target="_blank">Our Daraz Store</a></p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{{define "content"}}
+<section class="hero">
+    <div class="container hero-inner">
+        <div class="hero-copy">
+            <h1>Genuine tech accessories,<br>delivered to your door.</h1>
+            <p>Keyboards, audio, chargers and more — cash on delivery across Pakistan.</p>
+            <a class="btn btn-primary" href="#featured">Shop deals</a>
+        </div>
+    </div>
+</section>
+
+<section id="categories" class="section">
+    <div class="container">
+        <h2 class="section-title">Browse categories</h2>
+        <div class="chip-row">
+            {{range .Categories}}
+            <a class="chip" href="/c/{{.Slug}}">{{.Name}}</a>
+            {{end}}
+        </div>
+    </div>
+</section>
+
+<section id="featured" class="section">
+    <div class="container">
+        <h2 class="section-title">Featured deals</h2>
+        <div class="product-grid">
+            {{range .Featured}}{{template "product-card" .}}{{end}}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">New arrivals</h2>
+        <div class="product-grid">
+            {{range .Latest}}{{template "product-card" .}}{{end}}
+        </div>
+    </div>
+</section>
+{{end}}
