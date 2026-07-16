@@ -19,6 +19,8 @@ type ProductCard struct {
 	Price          float64
 	CompareAtPrice *float64
 	Image          string
+	VariantID      int64 // default variant, for one-click add-to-cart
+	InStock        bool
 }
 
 type Product struct {

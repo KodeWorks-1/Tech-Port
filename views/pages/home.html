@@ -1,40 +1,61 @@
 {{define "content"}}
-<section class="hero">
-    <div class="container hero-inner">
-        <div class="hero-copy">
-            <h1>Genuine tech accessories,<br>delivered to your door.</h1>
-            <p>Keyboards, audio, chargers and more — cash on delivery across Pakistan.</p>
-            <a class="btn btn-primary" href="#featured">Shop deals</a>
+<section class="banner-section">
+    <div class="container banner-grid">
+        <a class="banner banner-main" href="#deals">
+            <span class="banner-kicker">Launch offers</span>
+            <span class="banner-title">Genuine tech accessories<br>at Pakistan's best prices</span>
+            <span class="banner-sub">Keyboards · Audio · Chargers · More</span>
+            <span class="btn btn-primary banner-cta">Shop deals</span>
+        </a>
+        <div class="banner-side">
+            <a class="banner banner-sm banner-blue" href="/c/chargers-cables">
+                <span class="banner-sm-title">Free shipping</span>
+                <span class="banner-sm-sub">on orders over Rs. 5,000</span>
+            </a>
+            <a class="banner banner-sm banner-dark" href="/warranty-returns">
+                <span class="banner-sm-title">7-day returns</span>
+                <span class="banner-sm-sub">no questions asked</span>
+            </a>
         </div>
     </div>
 </section>
 
-<section id="categories" class="section">
+<section class="section" id="categories">
     <div class="container">
-        <h2 class="section-title">Browse categories</h2>
-        <div class="chip-row">
+        <h2 class="section-title">Shop by category</h2>
+        <div class="cat-grid">
             {{range .Categories}}
-            <a class="chip" href="/c/{{.Slug}}">{{.Name}}</a>
+            <a class="cat-card" href="/c/{{.Slug}}">
+                <span class="cat-card-img">{{if .Image}}<img src="{{.Image}}" alt="{{.Name}}" loading="lazy" width="120" height="120">{{end}}</span>
+                <span class="cat-card-name">{{.Name}}</span>
+            </a>
             {{end}}
         </div>
     </div>
 </section>
 
-<section id="featured" class="section">
+<section class="section" id="deals">
     <div class="container">
-        <h2 class="section-title">Featured deals</h2>
+        <div class="section-head">
+            <h2 class="section-title">🔥 Hot deals</h2>
+        </div>
         <div class="product-grid">
             {{range .Featured}}{{template "product-card" .}}{{end}}
         </div>
     </div>
 </section>
 
+{{range .Sections}}
 <section class="section">
     <div class="container">
-        <h2 class="section-title">New arrivals</h2>
+        <div class="section-head">
+            <h2 class="section-title">Top Selling {{.Category.Name}}</h2>
+            <a class="view-all" href="/c/{{.Category.Slug}}">View all →</a>
+        </div>
         <div class="product-grid">
-            {{range .Latest}}{{template "product-card" .}}{{end}}
+            {{range .Products}}{{template "product-card" .}}{{end}}
         </div>
     </div>
 </section>
+{{end}}
 {{end}}

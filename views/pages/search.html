@@ -1,0 +1,25 @@
+{{define "title"}}{{if .Query}}"{{.Query}}" — Search — TechPort{{else}}Search — TechPort{{end}}{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb"><a href="/">Home</a> <span>/</span> Search</nav>
+        {{if .Query}}
+        <h1 class="page-title">Results for "{{.Query}}" <span class="count-pill">{{len .Products}}</span></h1>
+        {{if .Products}}
+        <div class="product-grid listing-grid">
+            {{range .Products}}{{template "product-card" .}}{{end}}
+        </div>
+        {{else}}
+        <div class="cart-empty">
+            <p>Nothing found for "{{.Query}}". Try a different word, or browse the categories above.</p>
+            <a class="btn btn-primary" href="/">Browse the store</a>
+        </div>
+        {{end}}
+        {{else}}
+        <h1 class="page-title">Search</h1>
+        <p class="empty-note">Type at least 2 characters in the search box above.</p>
+        {{end}}
+    </div>
+</section>
+{{end}}

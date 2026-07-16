@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -54,7 +55,10 @@ const productCardQuery = `
 	SELECT p.id, p.slug, p.title, p.brand, c.name,
 	       p.base_price, p.compare_at_price,
 	       COALESCE((SELECT i.path FROM product_images i
-	                 WHERE i.product_id = p.id ORDER BY i.sort LIMIT 1), '')
+	                 WHERE i.product_id = p.id ORDER BY i.sort LIMIT 1), ''),
+	       COALESCE((SELECT v.id FROM product_variants v
+	                 WHERE v.product_id = p.id ORDER BY v.is_default DESC, v.id LIMIT 1), 0),
+	       EXISTS (SELECT 1 FROM product_variants v WHERE v.product_id = p.id AND v.stock > 0)
 	FROM products p
 	JOIN categories c ON c.id = p.category_id
 	WHERE p.active`
@@ -65,6 +69,43 @@ func (c *Catalog) Featured(ctx context.Context, limit int) ([]models.ProductCard
 
 func (c *Catalog) Latest(ctx context.Context, limit int) ([]models.ProductCard, error) {
 	return c.cards(ctx, productCardQuery+` ORDER BY p.created_at DESC LIMIT $1`, limit)
+}
+
+// Search matches title, brand, and description case-insensitively.
+func (c *Catalog) Search(ctx context.Context, q string, limit int) ([]models.ProductCard, error) {
+	pat := "%" + strings.ReplaceAll(strings.ReplaceAll(q, "%", `\%`), "_", `\_`) + "%"
+	return c.cards(ctx,
+		productCardQuery+` AND (p.title ILIKE $1 OR p.brand ILIKE $1 OR p.description ILIKE $1)
+		ORDER BY p.featured DESC, p.created_at DESC LIMIT $2`, pat, limit)
+}
+
+// CategoryCard is a category plus a representative product image.
+type CategoryCard struct {
+	models.Category
+	Image string
+}
+
+func (c *Catalog) CategoriesWithImage(ctx context.Context) ([]CategoryCard, error) {
+	rows, err := c.pool.Query(ctx, `
+		SELECT c.id, c.slug, c.name, c.sort,
+		       COALESCE((SELECT i.path FROM product_images i
+		                 JOIN products p ON p.id = i.product_id
+		                 WHERE p.category_id = c.id AND p.active
+		                 ORDER BY p.featured DESC, i.sort LIMIT 1), '')
+		FROM categories c ORDER BY c.sort, c.name`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []CategoryCard
+	for rows.Next() {
+		var cc CategoryCard
+		if err := rows.Scan(&cc.ID, &cc.Slug, &cc.Name, &cc.Sort, &cc.Image); err != nil {
+			return nil, err
+		}
+		out = append(out, cc)
+	}
+	return out, rows.Err()
 }
 
 func (c *Catalog) Related(ctx context.Context, categoryID, excludeProductID int64, limit int) ([]models.ProductCard, error) {
@@ -171,7 +212,7 @@ func (c *Catalog) cards(ctx context.Context, query string, args ...any) ([]model
 	for rows.Next() {
 		var p models.ProductCard
 		if err := rows.Scan(&p.ID, &p.Slug, &p.Title, &p.Brand, &p.CategoryName,
-			&p.Price, &p.CompareAtPrice, &p.Image); err != nil {
+			&p.Price, &p.CompareAtPrice, &p.Image, &p.VariantID, &p.InStock); err != nil {
 			return nil, err
 		}
 		out = append(out, p)

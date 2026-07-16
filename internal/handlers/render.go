@@ -52,12 +52,20 @@ var tmplFuncs = template.FuncMap{
 // templates are re-parsed on every request so edits show up on refresh.
 type Renderer struct {
 	dev   bool
+	funcs template.FuncMap
 	mu    sync.Mutex
 	cache map[string]*template.Template
 }
 
-func NewRenderer(dev bool) *Renderer {
-	return &Renderer{dev: dev, cache: map[string]*template.Template{}}
+func NewRenderer(dev bool, extra template.FuncMap) *Renderer {
+	funcs := template.FuncMap{}
+	for k, v := range tmplFuncs {
+		funcs[k] = v
+	}
+	for k, v := range extra {
+		funcs[k] = v
+	}
+	return &Renderer{dev: dev, funcs: funcs, cache: map[string]*template.Template{}}
 }
 
 // layoutFor picks the storefront or admin layout by page path
@@ -83,7 +91,7 @@ func (r *Renderer) load(page string) (*template.Template, error) {
 	files = append(files, partials...)
 	files = append(files, pageFile)
 
-	t, err := template.New(layout).Funcs(tmplFuncs).ParseFiles(files...)
+	t, err := template.New(layout).Funcs(r.funcs).ParseFiles(files...)
 	if err != nil {
 		return nil, fmt.Errorf("parse %s: %w", page, err)
 	}

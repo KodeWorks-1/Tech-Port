@@ -1,16 +1,27 @@
 {{define "product-card"}}
-<a class="product-card" href="/p/{{.Slug}}">
-    <div class="card-media">
-        <img src="{{.Image}}" alt="{{.Title}}" loading="lazy" width="400" height="400">
-        {{if .CompareAtPrice}}<span class="badge badge-sale">Sale</span>{{end}}
-    </div>
-    <div class="card-body">
-        <span class="card-category">{{.CategoryName}}</span>
-        <h3 class="card-title">{{.Title}}</h3>
-        <div class="card-price">
-            <span class="price">{{money .Price}}</span>
-            {{if .CompareAtPrice}}<span class="price-compare">{{moneyPtr .CompareAtPrice}}</span>{{end}}
+<div class="product-card">
+    <a class="card-link" href="/p/{{.Slug}}">
+        <div class="card-media">
+            <img src="{{.Image}}" alt="{{.Title}}" loading="lazy" width="400" height="400">
+            {{if .CompareAtPrice}}<span class="badge badge-sale">Sale</span>{{end}}
+            {{if not .InStock}}<span class="badge badge-oos">Out of stock</span>{{end}}
         </div>
-    </div>
-</a>
+        <div class="card-body">
+            <span class="card-category">{{.CategoryName}}</span>
+            <h3 class="card-title">{{.Title}}</h3>
+            <div class="card-price">
+                <span class="price">{{money .Price}}</span>
+                {{if .CompareAtPrice}}<span class="price-compare">{{moneyPtr .CompareAtPrice}}</span>{{end}}
+            </div>
+        </div>
+    </a>
+    {{if and .InStock .VariantID}}
+    <button class="card-add" hx-post="/cart/items" hx-swap="none"
+            hx-vals='{"variant_id": {{.VariantID}}, "qty": 1}'>
+        Add to cart
+    </button>
+    {{else}}
+    <a class="card-add card-add-view" href="/p/{{.Slug}}">View details</a>
+    {{end}}
+</div>
 {{end}}

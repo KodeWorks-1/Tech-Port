@@ -43,7 +43,7 @@ func main() {
 	orders := services.NewOrders(pool, settings)
 	admin := services.NewAdmin(pool)
 	adminAuth := services.NewAdminAuth(pool)
-	renderer := handlers.NewRenderer(cfg.Dev())
+	renderer := handlers.NewRenderer(cfg.Dev(), handlers.NavFuncs(catalog, settings))
 	h := handlers.New(catalog, cart, orders, settings, admin, adminAuth, renderer)
 
 	srv := &http.Server{
