@@ -192,6 +192,19 @@ func (o *Orders) Place(ctx context.Context, sessionID string, in PlaceOrderInput
 	return code, nil
 }
 
+// ByID loads an order for the admin views.
+func (o *Orders) ByID(ctx context.Context, id int64) (OrderDetail, error) {
+	var code string
+	err := o.pool.QueryRow(ctx, `SELECT code FROM orders WHERE id=$1`, id).Scan(&code)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return OrderDetail{}, ErrNotFound
+	}
+	if err != nil {
+		return OrderDetail{}, err
+	}
+	return o.ByCode(ctx, code)
+}
+
 func (o *Orders) ByCode(ctx context.Context, code string) (OrderDetail, error) {
 	var d OrderDetail
 	err := o.pool.QueryRow(ctx, `

@@ -1,0 +1,14 @@
+{{define "title"}}About us — TechPort{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container container-narrow">
+        <h1 class="page-title">About TechPort</h1>
+        <div class="static-copy">
+            <p>TechPort is a Pakistani online store for genuine tech accessories — keyboards, mice, audio, chargers, and more. We started on <a href="https://www.daraz.pk/shop/ge49t4yv/" rel="noopener" target="_blank">Daraz</a> and built this store to serve our customers directly, with better prices and faster support.</p>
+            <p>Every product we list is tested and covered by our 7-day return policy. We deliver nationwide with cash on delivery, so you only pay when your order is in your hands.</p>
+            <p>Questions? {{if .WhatsAppLink}}<a href="{{.WhatsAppLink}}" rel="noopener" target="_blank">Message us on WhatsApp</a> — we reply fast.{{else}}Reach us on WhatsApp — we reply fast.{{end}}</p>
+        </div>
+    </div>
+</section>
+{{end}}

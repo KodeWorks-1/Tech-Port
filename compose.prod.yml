@@ -1,0 +1,33 @@
+# Production stack: app + postgres. Put Cloudflare (or Caddy for TLS) in front.
+#   docker compose -f compose.prod.yml up -d --build
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env.production
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: techport
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in shell or .env}
+      POSTGRES_DB: techport
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U techport"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
+  uploads:

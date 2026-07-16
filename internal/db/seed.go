@@ -4,9 +4,34 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"golang.org/x/crypto/bcrypt"
 )
+
+// seedAdmin creates the default admin login on first run. The password MUST
+// be changed before going live.
+func seedAdmin(ctx context.Context, pool *pgxpool.Pool) error {
+	var n int
+	if err := pool.QueryRow(ctx, `SELECT count(*) FROM admin_users`).Scan(&n); err != nil {
+		return err
+	}
+	if n > 0 {
+		return nil
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte("changeme123"), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	if _, err := pool.Exec(ctx,
+		`INSERT INTO admin_users (email, password_hash) VALUES ($1, $2)`,
+		"admin@techport.pk", string(hash)); err != nil {
+		return err
+	}
+	slog.Warn("seeded default admin", "email", "admin@techport.pk", "password", "changeme123")
+	return nil
+}
 
 type seedProduct struct {
 	Slug      string
@@ -23,8 +48,12 @@ type seedProduct struct {
 }
 
 // SeedIfEmpty inserts demo catalog data on a fresh database so the store is
-// browsable before the customer's real catalog arrives.
+// browsable before the customer's real catalog arrives, and ensures a
+// default admin account exists.
 func SeedIfEmpty(ctx context.Context, pool *pgxpool.Pool) error {
+	if err := seedAdmin(ctx, pool); err != nil {
+		return err
+	}
 	var n int
 	if err := pool.QueryRow(ctx, `SELECT count(*) FROM products`).Scan(&n); err != nil {
 		return err

@@ -1,6 +1,16 @@
 {{define "title"}}{{.Title}} — Price in Pakistan | TechPort{{end}}
 {{define "meta_description"}}Buy {{.Title}} online in Pakistan at {{money .BasePrice}} with cash on delivery. {{.Brand}} — genuine product from TechPort.{{end}}
 
+{{define "head_extra"}}
+<link rel="canonical" href="{{.CanonicalURL}}">
+<meta property="og:type" content="product">
+<meta property="og:title" content="{{.Title}}">
+<meta property="og:description" content="Buy {{.Title}} at {{money .BasePrice}} with cash on delivery across Pakistan.">
+<meta property="og:url" content="{{.CanonicalURL}}">
+{{if .ImageURL}}<meta property="og:image" content="{{.ImageURL}}">{{end}}
+<script type="application/ld+json">{{.SchemaJSON}}</script>
+{{end}}
+
 {{define "content"}}
 <script>
 function pdp(variants, mainImg) {

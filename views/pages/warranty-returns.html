@@ -1,0 +1,19 @@
+{{define "title"}}Warranty & Returns — TechPort{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container container-narrow">
+        <h1 class="page-title">Warranty &amp; Returns</h1>
+        <div class="static-copy">
+            <h2>7-day returns</h2>
+            <p>If your item arrives damaged, defective, or not as described, tell us within 7 days of delivery and we'll replace it or refund you. Keep the original packaging and don't use the product beyond checking it.</p>
+            <h2>How to start a return</h2>
+            <p>{{if .WhatsAppLink}}<a href="{{.WhatsAppLink}}" rel="noopener" target="_blank">WhatsApp us</a>{{else}}WhatsApp us{{end}} your order code (TP-XXXXXX) with a photo or video of the issue. We'll arrange pickup or guide you to the nearest courier drop-off. Return shipping for defective items is on us.</p>
+            <h2>Warranty</h2>
+            <p>Products with a brand warranty are marked on the product page. Warranty claims are handled through us — same WhatsApp number, we deal with the supplier so you don't have to.</p>
+            <h2>What's not covered</h2>
+            <p>Physical damage after delivery, water damage on non-waterproof items, and products returned without their accessories or packaging.</p>
+        </div>
+    </div>
+</section>
+{{end}}

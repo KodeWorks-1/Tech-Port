@@ -1,0 +1,44 @@
+{{define "title"}}Settings — TechPort admin{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container container-narrow">
+        <h1 class="page-title">Store settings</h1>
+        {{if .Saved}}<div class="form-banner form-banner-success">Settings saved.</div>{{end}}
+
+        <form method="post" action="/admin/settings" class="admin-panel">
+            <h2 class="form-section-title">Shipping</h2>
+            <div class="field-row">
+                <label class="field">
+                    <span>Flat shipping fee (Rs.)</span>
+                    <input name="shipping_flat" type="number" min="0" step="1" value="{{printf "%.0f" .Shipping.Flat}}">
+                </label>
+                <label class="field">
+                    <span>Free shipping above (Rs.)</span>
+                    <input name="free_above" type="number" min="0" step="1" value="{{printf "%.0f" .Shipping.FreeAbove}}">
+                </label>
+            </div>
+
+            <h2 class="form-section-title">WhatsApp</h2>
+            <label class="field">
+                <span>Business WhatsApp number <small>(with country code, e.g. +923001234567)</small></span>
+                <input name="whatsapp" value="{{.WhatsApp}}">
+            </label>
+
+            <h2 class="form-section-title">Payment methods</h2>
+            <p class="pay-note">Disabled methods still show at checkout as "Coming soon".</p>
+            <div class="check-row check-col">
+                {{range .Methods}}
+                <label class="check">
+                    <input type="checkbox" name="method_{{.Key}}" {{if .Enabled}}checked{{end}}
+                           {{if eq .Key "cod"}}onclick="return confirm('COD is your only working payment method — really toggle it?')"{{end}}>
+                    {{.Label}}
+                </label>
+                {{end}}
+            </div>
+
+            <button class="btn btn-primary" type="submit">Save settings</button>
+        </form>
+    </div>
+</section>
+{{end}}

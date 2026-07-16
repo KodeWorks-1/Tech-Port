@@ -1,0 +1,21 @@
+{{define "title"}}Admin login — TechPort{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container login-wrap">
+        <form class="track-form login-form" method="post" action="/admin/login">
+            <h1 class="page-title">Admin login</h1>
+            {{with .Error}}<div class="form-banner form-banner-error">{{.}}</div>{{end}}
+            <label class="field">
+                <span>Email</span>
+                <input name="email" type="email" value="{{.Email}}" required autofocus>
+            </label>
+            <label class="field">
+                <span>Password</span>
+                <input name="password" type="password" required>
+            </label>
+            <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+        </form>
+    </div>
+</section>
+{{end}}

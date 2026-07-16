@@ -1,0 +1,55 @@
+{{define "title"}}Dashboard — TechPort admin{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container">
+        <h1 class="page-title">Dashboard</h1>
+
+        <div class="stat-row">
+            <div class="stat-tile"><span class="stat-label">Orders today</span><span class="stat-value">{{.Stats.OrdersToday}}</span></div>
+            <div class="stat-tile"><span class="stat-label">Revenue today</span><span class="stat-value">{{money .Stats.RevenueToday}}</span></div>
+            <div class="stat-tile"><span class="stat-label">Orders (7 days)</span><span class="stat-value">{{.Stats.OrdersWeek}}</span></div>
+            <div class="stat-tile"><span class="stat-label">Revenue (7 days)</span><span class="stat-value">{{money .Stats.RevenueWeek}}</span></div>
+            <div class="stat-tile {{if .Stats.PendingOrders}}stat-tile-alert{{end}}">
+                <span class="stat-label">Pending orders</span><span class="stat-value">{{.Stats.PendingOrders}}</span>
+            </div>
+        </div>
+
+        <div class="admin-cols">
+            <div class="admin-panel">
+                <h2 class="form-section-title">Recent orders</h2>
+                {{if .Recent}}
+                <table class="admin-table">
+                    <tr><th>Code</th><th>Customer</th><th>City</th><th>Total</th><th>Status</th></tr>
+                    {{range .Recent}}
+                    <tr>
+                        <td><a href="/admin/orders/{{.ID}}">{{.Code}}</a></td>
+                        <td>{{.CustomerName}}</td>
+                        <td>{{.City}}</td>
+                        <td>{{money .Total}}</td>
+                        <td><span class="status-badge status-{{.Status}}">{{.Status}}</span></td>
+                    </tr>
+                    {{end}}
+                </table>
+                {{else}}<p class="empty-note">No orders yet.</p>{{end}}
+            </div>
+
+            <div class="admin-panel">
+                <h2 class="form-section-title">Low stock (≤ 5)</h2>
+                {{if .LowStock}}
+                <table class="admin-table">
+                    <tr><th>Product</th><th>Variant</th><th>Stock</th></tr>
+                    {{range .LowStock}}
+                    <tr>
+                        <td><a href="/admin/products/{{.ProductID}}">{{.Title}}</a></td>
+                        <td>{{range $k, $v := .Options}}{{$v}} {{end}}</td>
+                        <td class="{{if eq .Stock 0}}stock-zero{{end}}">{{.Stock}}</td>
+                    </tr>
+                    {{end}}
+                </table>
+                {{else}}<p class="empty-note">All good — nothing running low.</p>{{end}}
+            </div>
+        </div>
+    </div>
+</section>
+{{end}}

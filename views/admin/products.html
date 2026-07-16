@@ -1,0 +1,29 @@
+{{define "title"}}Products — TechPort admin{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container">
+        <div class="listing-head">
+            <h1 class="page-title">Products</h1>
+            <a class="btn btn-primary" href="/admin/products/new">+ Add product</a>
+        </div>
+
+        <table class="admin-table admin-table-wide">
+            <tr><th>Title</th><th>Category</th><th>Price</th><th>Stock</th><th>Flags</th><th></th></tr>
+            {{range .Products}}
+            <tr class="{{if not .Active}}row-inactive{{end}}">
+                <td><a href="/admin/products/{{.ID}}">{{.Title}}</a></td>
+                <td>{{.CategoryName}}</td>
+                <td>{{money .BasePrice}}</td>
+                <td class="{{if eq .Stock 0}}stock-zero{{end}}">{{.Stock}}</td>
+                <td>
+                    {{if not .Active}}<span class="status-badge status-cancelled">hidden</span>{{end}}
+                    {{if .Featured}}<span class="status-badge status-confirmed">featured</span>{{end}}
+                </td>
+                <td><a class="table-link" href="/p/{{.Slug}}" target="_blank">view ↗</a></td>
+            </tr>
+            {{end}}
+        </table>
+    </div>
+</section>
+{{end}}

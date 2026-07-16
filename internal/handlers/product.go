@@ -19,8 +19,11 @@ type productData struct {
 	services.ProductDetail
 	Related      []models.ProductCard
 	VariantsJSON template.JS
+	SchemaJSON   template.JS
 	WhatsAppLink string
 	HasOptions   bool
+	CanonicalURL string
+	ImageURL     string
 }
 
 // variantJSON is the client-side shape the Alpine variant picker consumes.
@@ -83,11 +86,52 @@ func (h *Handlers) Product(w http.ResponseWriter, r *http.Request) {
 		waLink = "https://wa.me/" + strings.TrimPrefix(waNumber, "+") + "?text=" + url.QueryEscape(msg)
 	}
 
+	base := baseURL(r)
+	canonical := base + "/p/" + detail.Slug
+	imageURL := ""
+	if len(detail.Images) > 0 {
+		imageURL = base + detail.Images[0].Path
+	}
+	inStock := false
+	for _, v := range detail.Variants {
+		if v.Stock > 0 {
+			inStock = true
+		}
+	}
+	availability := "https://schema.org/OutOfStock"
+	if inStock {
+		availability = "https://schema.org/InStock"
+	}
+	schema := map[string]any{
+		"@context":    "https://schema.org",
+		"@type":       "Product",
+		"name":        detail.Title,
+		"description": detail.Description,
+		"image":       imageURL,
+		"brand":       map[string]any{"@type": "Brand", "name": detail.Brand},
+		"offers": map[string]any{
+			"@type":         "Offer",
+			"url":           canonical,
+			"price":         detail.BasePrice,
+			"priceCurrency": "PKR",
+			"availability":  availability,
+		},
+	}
+	schemaRaw, err := json.Marshal(schema)
+	if err != nil {
+		slog.Error("product: marshal schema", "err", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+
 	h.renderer.Render(w, "product.html", productData{
 		ProductDetail: detail,
 		Related:       related,
 		VariantsJSON:  template.JS(raw),
+		SchemaJSON:    template.JS(schemaRaw),
 		WhatsAppLink:  waLink,
 		HasOptions:    hasOptions,
+		CanonicalURL:  canonical,
+		ImageURL:      imageURL,
 	})
 }

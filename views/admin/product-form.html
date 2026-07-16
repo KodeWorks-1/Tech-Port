@@ -1,0 +1,109 @@
+{{define "title"}}{{if .IsNew}}New product{{else}}Edit product{{end}} — TechPort admin{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb"><a href="/admin/products">Products</a> <span>/</span> {{if .IsNew}}New{{else}}{{.Product.Title}}{{end}}</nav>
+        <h1 class="page-title">{{if .IsNew}}Add product{{else}}Edit product{{end}}</h1>
+
+        {{with .Error}}<div class="form-banner form-banner-error">{{.}}</div>{{end}}
+
+        <div class="admin-cols">
+            <div class="admin-panel">
+                <form method="post" action="{{if .IsNew}}/admin/products{{else}}/admin/products/{{.Product.ID}}{{end}}">
+                    <label class="field">
+                        <span>Title</span>
+                        <input name="title" value="{{.Product.Title}}" required>
+                    </label>
+                    <div class="field-row">
+                        <label class="field">
+                            <span>Brand</span>
+                            <input name="brand" value="{{.Product.Brand}}">
+                        </label>
+                        <label class="field">
+                            <span>Category</span>
+                            <select name="category_id" class="sort-select">
+                                {{$cid := .Product.CategoryID}}
+                                {{range .Categories}}
+                                <option value="{{.ID}}" {{if eq .ID $cid}}selected{{end}}>{{.Name}}</option>
+                                {{end}}
+                            </select>
+                        </label>
+                    </div>
+                    <div class="field-row">
+                        <label class="field">
+                            <span>Price (Rs.)</span>
+                            <input name="base_price" type="number" step="1" min="0" value="{{printf "%.0f" .Product.BasePrice}}" required>
+                        </label>
+                        <label class="field">
+                            <span>Compare-at price <small>(optional, shows as strikethrough)</small></span>
+                            <input name="compare_at_price" type="number" step="1" min="0"
+                                   value="{{if .Product.CompareAtPrice}}{{printf "%.0f" (deref .Product.CompareAtPrice)}}{{end}}">
+                        </label>
+                    </div>
+                    {{if .IsNew}}
+                    <label class="field">
+                        <span>Initial stock</span>
+                        <input name="stock" type="number" min="0" value="10">
+                    </label>
+                    {{end}}
+                    <label class="field">
+                        <span>Description</span>
+                        <textarea name="description" rows="4">{{.Product.Description}}</textarea>
+                    </label>
+                    <label class="field">
+                        <span>Specifications <small>(one per line, "Name: Value")</small></span>
+                        <textarea name="specs" rows="5" placeholder="Connectivity: Bluetooth 5.0&#10;Battery: 12 hours">{{.SpecsText}}</textarea>
+                    </label>
+                    <div class="check-row">
+                        <label class="check"><input type="checkbox" name="active" {{if .Product.Active}}checked{{end}}> Visible in store</label>
+                        <label class="check"><input type="checkbox" name="featured" {{if .Product.Featured}}checked{{end}}> Featured on homepage</label>
+                    </div>
+                    <button class="btn btn-primary" type="submit">{{if .IsNew}}Create product{{else}}Save changes{{end}}</button>
+                </form>
+            </div>
+
+            {{if not .IsNew}}
+            <div class="admin-panel">
+                <h2 class="form-section-title">Variants</h2>
+                {{range .Product.Variants}}
+                <form method="post" action="/admin/variants/{{.ID}}" class="variant-form">
+                    <input type="hidden" name="product_id" value="{{.ProductID}}">
+                    <input name="options" value="{{range $k, $v := .Options}}{{$k}}={{$v}}; {{end}}" placeholder="Color=Black" title="Options">
+                    <input name="price" type="number" step="1" min="0" value="{{printf "%.0f" .Price}}" title="Price">
+                    <input name="stock" type="number" min="0" value="{{.Stock}}" title="Stock">
+                    <button class="btn btn-outline btn-xs" type="submit">Save</button>
+                    <button class="btn btn-outline btn-xs btn-danger" type="submit" name="delete" value="1"
+                            onclick="return confirm('Delete this variant?')">✕</button>
+                </form>
+                {{end}}
+                <form method="post" action="/admin/products/{{.Product.ID}}/variants" class="variant-form variant-form-new">
+                    <input name="options" placeholder="Color=White" title="Options">
+                    <input name="price" type="number" step="1" min="0" placeholder="Price" required title="Price">
+                    <input name="stock" type="number" min="0" placeholder="Stock" required title="Stock">
+                    <button class="btn btn-outline btn-xs" type="submit">+ Add</button>
+                </form>
+
+                <h2 class="form-section-title">Images</h2>
+                <div class="img-grid">
+                    {{range .Product.Images}}
+                    <div class="img-tile">
+                        <img src="{{.Path}}" alt="{{.Alt}}" width="90" height="90">
+                        <form method="post" action="/admin/images/{{.ID}}/delete">
+                            <input type="hidden" name="back" value="/admin/products/{{.ProductID}}">
+                            <button class="img-del" type="submit" onclick="return confirm('Remove this image?')">✕</button>
+                        </form>
+                    </div>
+                    {{end}}
+                </div>
+                <form method="post" action="/admin/products/{{.Product.ID}}/images" enctype="multipart/form-data" class="upload-form">
+                    <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,.svg" required>
+                    <input name="alt" placeholder="Alt text (optional)">
+                    <button class="btn btn-outline btn-xs" type="submit">Upload</button>
+                </form>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</section>
+{{end}}

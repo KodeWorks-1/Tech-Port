@@ -1,0 +1,36 @@
+{{define "title"}}Orders — TechPort admin{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container">
+        <div class="listing-head">
+            <h1 class="page-title">Orders</h1>
+            <select class="sort-select" onchange="location.href=this.value">
+                <option value="/admin/orders" {{if eq .Filter ""}}selected{{end}}>All statuses</option>
+                {{$f := .Filter}}
+                {{range .Statuses}}
+                <option value="/admin/orders?status={{.}}" {{if eq $f .}}selected{{end}}>{{.}}</option>
+                {{end}}
+            </select>
+        </div>
+
+        {{if .Orders}}
+        <table class="admin-table admin-table-wide">
+            <tr><th>Code</th><th>Placed</th><th>Customer</th><th>Phone</th><th>City</th><th>Items</th><th>Total</th><th>Status</th></tr>
+            {{range .Orders}}
+            <tr>
+                <td><a href="/admin/orders/{{.ID}}">{{.Code}}</a></td>
+                <td>{{.CreatedAt.Format "2 Jan, 3:04 PM"}}</td>
+                <td>{{.CustomerName}}</td>
+                <td>{{.Phone}}</td>
+                <td>{{.City}}</td>
+                <td>{{.ItemCount}}</td>
+                <td>{{money .Total}}</td>
+                <td><span class="status-badge status-{{.Status}}">{{.Status}}</span></td>
+            </tr>
+            {{end}}
+        </table>
+        {{else}}<p class="empty-note">No orders{{with .Filter}} with status "{{.}}"{{end}}.</p>{{end}}
+    </div>
+</section>
+{{end}}

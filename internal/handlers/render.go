@@ -14,6 +14,12 @@ import (
 var tmplFuncs = template.FuncMap{
 	"add": func(a, b int) int { return a + b },
 	"sub": func(a, b int) int { return a - b },
+	"deref": func(v *float64) float64 {
+		if v == nil {
+			return 0
+		}
+		return *v
+	},
 	// money renders "Rs. 3,000" from a float rupee amount.
 	"money": func(v float64) string {
 		s := strconv.FormatFloat(v, 'f', 0, 64)
@@ -54,6 +60,15 @@ func NewRenderer(dev bool) *Renderer {
 	return &Renderer{dev: dev, cache: map[string]*template.Template{}}
 }
 
+// layoutFor picks the storefront or admin layout by page path
+// ("admin/x.html" lives in views/admin/, everything else in views/pages/).
+func layoutFor(page string) (layoutFile, pageFile string) {
+	if rest, ok := strings.CutPrefix(page, "admin/"); ok {
+		return "admin-layout.html", filepath.Join("views", "admin", rest)
+	}
+	return "layout.html", filepath.Join("views", "pages", page)
+}
+
 func (r *Renderer) load(page string) (*template.Template, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -62,12 +77,13 @@ func (r *Renderer) load(page string) (*template.Template, error) {
 			return t, nil
 		}
 	}
-	files := []string{filepath.Join("views", "layout.html")}
+	layout, pageFile := layoutFor(page)
+	files := []string{filepath.Join("views", layout)}
 	partials, _ := filepath.Glob(filepath.Join("views", "partials", "*.html"))
 	files = append(files, partials...)
-	files = append(files, filepath.Join("views", "pages", page))
+	files = append(files, pageFile)
 
-	t, err := template.New("layout.html").Funcs(tmplFuncs).ParseFiles(files...)
+	t, err := template.New(layout).Funcs(tmplFuncs).ParseFiles(files...)
 	if err != nil {
 		return nil, fmt.Errorf("parse %s: %w", page, err)
 	}
@@ -97,8 +113,9 @@ func (r *Renderer) Render(w http.ResponseWriter, page string, data any) {
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
+	layout, _ := layoutFor(page)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := t.ExecuteTemplate(w, "layout.html", data); err != nil {
+	if err := t.ExecuteTemplate(w, layout, data); err != nil {
 		slog.Error("template render failed", "page", page, "err", err)
 	}
 }

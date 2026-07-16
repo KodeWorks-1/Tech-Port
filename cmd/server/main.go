@@ -41,8 +41,10 @@ func main() {
 	cart := services.NewCart(pool)
 	settings := services.NewSettings(pool)
 	orders := services.NewOrders(pool, settings)
+	admin := services.NewAdmin(pool)
+	adminAuth := services.NewAdminAuth(pool)
 	renderer := handlers.NewRenderer(cfg.Dev())
-	h := handlers.New(catalog, cart, orders, settings, renderer)
+	h := handlers.New(catalog, cart, orders, settings, admin, adminAuth, renderer)
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,

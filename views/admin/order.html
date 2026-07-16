@@ -1,0 +1,62 @@
+{{define "title"}}Order {{.Code}} — TechPort admin{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb"><a href="/admin/orders">Orders</a> <span>/</span> {{.Code}}</nav>
+        <div class="listing-head">
+            <h1 class="page-title">{{.Code}} <span class="status-badge status-{{.Status}}">{{.Status}}</span></h1>
+            <span class="order-meta">Placed {{.CreatedAt.Format "2 Jan 2006, 3:04 PM"}} · {{.PaymentMethod}}</span>
+        </div>
+
+        <div class="admin-cols">
+            <div class="admin-panel">
+                <h2 class="form-section-title">Items</h2>
+                {{range .Items}}
+                <div class="summary-row summary-item">
+                    <span>{{.Title}}{{if .Options}} ({{range $k, $v := .Options}}{{$v}} {{end}}){{end}} × {{.Qty}}</span>
+                    <span>{{money .LineTotal}}</span>
+                </div>
+                {{end}}
+                <div class="summary-row"><span>Subtotal</span><span>{{money .Subtotal}}</span></div>
+                <div class="summary-row"><span>Shipping</span><span>{{money .ShippingFee}}</span></div>
+                <div class="summary-row summary-total"><span>Total</span><span>{{money .Total}}</span></div>
+
+                <h2 class="form-section-title">Customer</h2>
+                <p class="order-customer">{{.CustomerName}}<br>{{.Address}}<br>{{.City}}<br>
+                    <a href="tel:{{.Phone}}">{{.Phone}}</a></p>
+                {{if .Notes}}<p class="order-notes">Customer note: {{.Notes}}</p>{{end}}
+            </div>
+
+            <div class="admin-panel">
+                <h2 class="form-section-title">Update status</h2>
+                <form method="post" action="/admin/orders/{{.ID}}/status" class="status-form">
+                    <div class="pay-methods">
+                        {{$cur := .Status}}
+                        {{range .Statuses}}
+                        <label class="pay-method">
+                            <input type="radio" name="status" value="{{.}}" {{if eq . $cur}}checked{{end}}>
+                            <span class="pay-method-label">{{.}}</span>
+                        </label>
+                        {{end}}
+                    </div>
+                    <label class="field" style="margin-top:12px">
+                        <span>Note <small>(optional — saved to history)</small></span>
+                        <input name="note" placeholder="e.g. Booked with courier, CN #12345">
+                    </label>
+                    <button class="btn btn-primary" type="submit">Update status</button>
+                    <p class="pay-note">Cancelling or returning puts the items back in stock automatically.</p>
+                </form>
+
+                <h2 class="form-section-title">History</h2>
+                <ul class="event-list">
+                    {{range .Events}}
+                    <li><span class="event-time">{{.CreatedAt.Format "2 Jan, 3:04 PM"}}</span>
+                        <span class="status-badge status-{{.Status}}">{{.Status}}</span> {{.Note}}</li>
+                    {{end}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{{end}}

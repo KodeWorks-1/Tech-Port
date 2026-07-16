@@ -1,0 +1,21 @@
+{{define "title"}}Categories — TechPort admin{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container container-narrow">
+        <h1 class="page-title">Categories</h1>
+
+        <table class="admin-table">
+            <tr><th>Name</th><th>Slug</th><th>Products</th></tr>
+            {{range .Categories}}
+            <tr><td>{{.Name}}</td><td>{{.Slug}}</td><td>{{.ProductCount}}</td></tr>
+            {{end}}
+        </table>
+
+        <form method="post" action="/admin/categories" class="inline-form">
+            <input name="name" placeholder="New category name" required>
+            <button class="btn btn-primary" type="submit">Add category</button>
+        </form>
+    </div>
+</section>
+{{end}}

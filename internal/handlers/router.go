@@ -10,15 +10,20 @@ import (
 )
 
 type Handlers struct {
-	catalog  *services.Catalog
-	cart     *services.Cart
-	orders   *services.Orders
-	settings *services.Settings
-	renderer *Renderer
+	catalog   *services.Catalog
+	cart      *services.Cart
+	orders    *services.Orders
+	settings  *services.Settings
+	admin     *services.Admin
+	adminAuth *services.AdminAuth
+	renderer  *Renderer
 }
 
-func New(catalog *services.Catalog, cart *services.Cart, orders *services.Orders, settings *services.Settings, renderer *Renderer) *Handlers {
-	return &Handlers{catalog: catalog, cart: cart, orders: orders, settings: settings, renderer: renderer}
+func New(catalog *services.Catalog, cart *services.Cart, orders *services.Orders,
+	settings *services.Settings, admin *services.Admin, adminAuth *services.AdminAuth,
+	renderer *Renderer) *Handlers {
+	return &Handlers{catalog: catalog, cart: cart, orders: orders, settings: settings,
+		admin: admin, adminAuth: adminAuth, renderer: renderer}
 }
 
 func (h *Handlers) Router() http.Handler {
@@ -30,6 +35,8 @@ func (h *Handlers) Router() http.Handler {
 
 	fs := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
 	r.Handle("/static/*", cacheStatic(fs))
+	uploads := http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads")))
+	r.Handle("/uploads/*", cacheStatic(uploads))
 
 	r.Get("/health", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -52,6 +59,44 @@ func (h *Handlers) Router() http.Handler {
 		r.Post("/checkout", h.PlaceOrder)
 		r.Get("/order/{code}", h.OrderPage)
 		r.Get("/track", h.Track)
+
+		r.Get("/about", h.StaticPage("about.html"))
+		r.Get("/warranty-returns", h.StaticPage("warranty-returns.html"))
+	})
+
+	r.Get("/robots.txt", h.Robots)
+	r.Get("/sitemap.xml", h.Sitemap)
+
+	r.Route("/admin", func(r chi.Router) {
+		r.Get("/login", h.AdminLoginPage)
+		r.Post("/login", h.AdminLogin)
+
+		r.Group(func(r chi.Router) {
+			r.Use(h.requireAdmin)
+
+			r.Get("/", h.AdminDashboard)
+			r.Post("/logout", h.AdminLogout)
+
+			r.Get("/orders", h.AdminOrders)
+			r.Get("/orders/{id}", h.AdminOrder)
+			r.Post("/orders/{id}/status", h.AdminOrderStatus)
+
+			r.Get("/products", h.AdminProducts)
+			r.Get("/products/new", h.AdminProductNew)
+			r.Post("/products", h.AdminProductCreate)
+			r.Get("/products/{id}", h.AdminProductEdit)
+			r.Post("/products/{id}", h.AdminProductUpdate)
+			r.Post("/products/{id}/variants", h.AdminVariantAdd)
+			r.Post("/variants/{id}", h.AdminVariantUpdate)
+			r.Post("/products/{id}/images", h.AdminImageUpload)
+			r.Post("/images/{id}/delete", h.AdminImageDelete)
+
+			r.Get("/categories", h.AdminCategories)
+			r.Post("/categories", h.AdminCategoryCreate)
+
+			r.Get("/settings", h.AdminSettingsPage)
+			r.Post("/settings", h.AdminSettingsSave)
+		})
 	})
 
 	return r

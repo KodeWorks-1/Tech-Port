@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/static/css/app.css">
     <script src="/static/js/htmx.min.js" defer></script>
     <script src="/static/js/alpine.min.js" defer></script>
+    {{block "head_extra" .}}{{end}}
 </head>
 <body hx-boost="true">
 <header class="site-header">
@@ -45,7 +46,7 @@
         </div>
         <div class="footer-bottom">
             <p>© 2026 TechPort — Tech accessories, delivered across Pakistan.</p>
-            <p class="footer-links"><a href="/">Home</a> · <a href="https://www.daraz.pk/shop/ge49t4yv/" rel="noopener" target="_blank">Our Daraz Store</a></p>
+            <p class="footer-links"><a href="/about">About</a> · <a href="/warranty-returns">Warranty &amp; Returns</a> · <a href="/track">Track order</a> · <a href="https://www.daraz.pk/shop/ge49t4yv/" rel="noopener" target="_blank">Our Daraz Store</a></p>
         </div>
     </div>
 </footer>
