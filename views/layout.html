@@ -78,6 +78,30 @@
      @toast.window="msg = $event.detail.value; setTimeout(() => msg = '', 2200)"
      x-show="msg.length > 0" x-text="msg" x-cloak></div>
 
+<nav class="bottom-nav" x-data="{p: location.pathname}" aria-label="Mobile navigation">
+    <a href="/" :class="p === '/' && 'bn-active'">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+    </a>
+    <a href="/search" :class="p.startsWith('/search') && 'bn-active'">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <span>Search</span>
+    </a>
+    <a href="/#categories" :class="p.startsWith('/c/') && 'bn-active'">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Explore</span>
+    </a>
+    <a href="/cart" class="bn-cart" :class="p === '/cart' && 'bn-active'">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span>Cart</span>
+        <em class="bn-badge" hx-get="/cart/count" hx-trigger="load, cart-updated from:body" hx-swap="innerHTML">0</em>
+    </a>
+    <a href="/account" :class="p.startsWith('/account') && 'bn-active'">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Profile</span>
+    </a>
+</nav>
+
 <footer class="site-footer">
     <div class="container">
         <div class="trust-row">
