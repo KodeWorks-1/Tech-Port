@@ -28,7 +28,7 @@ func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
-	featured, err := h.catalog.Featured(ctx, 8)
+	featured, err := h.catalog.Featured(ctx, 4)
 	if err != nil {
 		slog.Error("home: featured", "err", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)

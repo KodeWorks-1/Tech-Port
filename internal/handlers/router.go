@@ -34,9 +34,9 @@ func (h *Handlers) Router() http.Handler {
 	r.Use(middleware.Compress(5))
 
 	fs := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
-	r.Handle("/static/*", cacheStatic(fs))
+	r.Handle("/static/*", h.cacheStatic(fs))
 	uploads := http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads")))
-	r.Handle("/uploads/*", cacheStatic(uploads))
+	r.Handle("/uploads/*", h.cacheStatic(uploads))
 
 	r.Get("/health", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -103,9 +103,13 @@ func (h *Handlers) Router() http.Handler {
 	return r
 }
 
-func cacheStatic(next http.Handler) http.Handler {
+func (h *Handlers) cacheStatic(next http.Handler) http.Handler {
+	cache := "public, max-age=86400"
+	if h.renderer.dev {
+		cache = "no-cache"
+	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Cache-Control", "public, max-age=86400")
+		w.Header().Set("Cache-Control", cache)
 		next.ServeHTTP(w, r)
 	})
 }

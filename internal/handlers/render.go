@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log/slog"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -19,6 +20,14 @@ var tmplFuncs = template.FuncMap{
 			return 0
 		}
 		return *v
+	},
+	// assetVer busts browser/CDN caches when the stylesheet changes.
+	"assetVer": func() int64 {
+		fi, err := os.Stat(filepath.Join("static", "css", "app.css"))
+		if err != nil {
+			return 0
+		}
+		return fi.ModTime().Unix()
 	},
 	// money renders "Rs. 3,000" from a float rupee amount.
 	"money": func(v float64) string {
