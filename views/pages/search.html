@@ -4,6 +4,14 @@
 <section class="section">
     <div class="container">
         <nav class="breadcrumb"><a href="/">Home</a> <span>/</span> Search</nav>
+
+        <form class="search-form search-form-page" action="/search" method="get">
+            <input type="search" name="q" value="{{.Query}}" placeholder="Search for products…" aria-label="Search products" minlength="2" required autofocus>
+            <button type="submit" aria-label="Search">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            </button>
+        </form>
+
         {{if .Query}}
         <h1 class="page-title">Results for "{{.Query}}" <span class="count-pill">{{len .Products}}</span></h1>
         {{if .Products}}
@@ -17,8 +25,11 @@
         </div>
         {{end}}
         {{else}}
-        <h1 class="page-title">Search</h1>
-        <p class="empty-note">Type at least 2 characters in the search box above.</p>
+        <h1 class="page-title">Search the store</h1>
+        <p class="empty-note">Try "keyboard", "mouse", "cooling pad", "backpack"…</p>
+        <div class="chip-row">
+            {{range navCategories}}<a class="chip" href="/c/{{.Slug}}">{{.Name}}</a>{{end}}
+        </div>
         {{end}}
     </div>
 </section>

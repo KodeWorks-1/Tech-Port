@@ -203,8 +203,9 @@ func (h *Handlers) AccountSave(w http.ResponseWriter, r *http.Request) {
 }
 
 type myOrdersData struct {
-	User   services.User
-	Orders []services.OrderSummary
+	User services.User
+	Live []services.OrderSummary // pending / confirmed / shipped
+	Past []services.OrderSummary // delivered / cancelled / returned
 }
 
 func (h *Handlers) MyOrders(w http.ResponseWriter, r *http.Request) {
@@ -215,5 +216,14 @@ func (h *Handlers) MyOrders(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
-	h.renderer.Render(w, "account-orders.html", myOrdersData{User: u, Orders: orders})
+	data := myOrdersData{User: u}
+	for _, o := range orders {
+		switch o.Status {
+		case "pending", "confirmed", "shipped":
+			data.Live = append(data.Live, o)
+		default:
+			data.Past = append(data.Past, o)
+		}
+	}
+	h.renderer.Render(w, "account-orders.html", data)
 }

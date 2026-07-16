@@ -7,26 +7,57 @@
             <h1 class="page-title">My Orders</h1>
             <nav class="account-tabs">
                 <a href="/account">Profile</a>
-                <a class="tab-active" href="/account/orders">My Orders</a>
+                <a class="tab-active" href="/account/orders">Live Orders</a>
+                <a href="/account/orders#history">Order History</a>
             </nav>
         </div>
 
-        {{if .Orders}}
-        <table class="admin-table admin-table-wide">
-            <tr><th>Order</th><th>Placed</th><th>Items</th><th>Total</th><th>Status</th></tr>
-            {{range .Orders}}
-            <tr>
-                <td><a href="/order/{{.Code}}">{{.Code}}</a></td>
-                <td>{{.CreatedAt.Format "2 Jan 2006"}}</td>
-                <td>{{.ItemCount}}</td>
-                <td>{{money .Total}}</td>
-                <td><span class="status-badge status-{{.Status}}">{{.Status}}</span></td>
-            </tr>
+        <h2 class="form-section-title">Live orders</h2>
+        {{if .Live}}
+        <div class="order-cards">
+            {{range .Live}}
+            <a class="order-card" href="/order/{{.Code}}">
+                <div class="order-card-top">
+                    <strong>{{.Code}}</strong>
+                    <span class="status-badge status-{{.Status}}">{{.Status}}</span>
+                </div>
+                <div class="order-card-meta">
+                    <span>{{.CreatedAt.Format "2 Jan 2006"}}</span>
+                    <span>{{.ItemCount}} item{{if ne .ItemCount 1}}s{{end}}</span>
+                    <span class="order-card-total">{{money .Total}}</span>
+                </div>
+                <span class="order-card-cta">Track order →</span>
+            </a>
             {{end}}
-        </table>
+        </div>
         {{else}}
+        <p class="empty-note">Nothing on the way right now.</p>
+        {{end}}
+
+        <h2 class="form-section-title" id="history">Order history</h2>
+        {{if .Past}}
+        <div class="order-cards">
+            {{range .Past}}
+            <a class="order-card order-card-past" href="/order/{{.Code}}">
+                <div class="order-card-top">
+                    <strong>{{.Code}}</strong>
+                    <span class="status-badge status-{{.Status}}">{{.Status}}</span>
+                </div>
+                <div class="order-card-meta">
+                    <span>{{.CreatedAt.Format "2 Jan 2006"}}</span>
+                    <span>{{.ItemCount}} item{{if ne .ItemCount 1}}s{{end}}</span>
+                    <span class="order-card-total">{{money .Total}}</span>
+                </div>
+                <span class="order-card-cta">View details →</span>
+            </a>
+            {{end}}
+        </div>
+        {{else}}
+        <p class="empty-note">No completed orders yet.</p>
+        {{end}}
+
+        {{if and (not .Live) (not .Past)}}
         <div class="cart-empty">
-            <p>No orders yet — your orders will show up here.</p>
             <a class="btn btn-primary" href="/">Start shopping</a>
         </div>
         {{end}}
