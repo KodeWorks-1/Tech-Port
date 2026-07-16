@@ -1,16 +1,21 @@
 {{define "account-menu"}}
 {{if .LoggedIn}}
 <div class="acct-dd" x-data="{open: false}" @click.outside="open = false">
-    <button class="acct-btn" @click="open = !open">Hi, {{.Name}} ▾</button>
+    <button class="acct-btn" @click="open = !open" aria-haspopup="true" :aria-expanded="open">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        {{.Name}}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
     <div class="acct-menu" x-show="open" x-cloak>
-        <a href="/account">My Account</a>
-        <a href="/account/orders">My Orders</a>
-        <form method="post" action="/logout"><button type="submit">Logout</button></form>
+        <a href="/account">My account</a>
+        <a href="/account/orders">My orders</a>
+        <form method="post" action="/logout"><button type="submit">Log out</button></form>
     </div>
 </div>
 {{else}}
-<a href="/login">Login</a>
-<span class="promo-sep">|</span>
-<a href="/register">Sign Up</a>
+<a class="acct-btn" href="/login">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Sign in
+</a>
 {{end}}
 {{end}}

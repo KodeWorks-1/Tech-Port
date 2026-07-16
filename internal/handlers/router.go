@@ -48,7 +48,6 @@ func (h *Handlers) Router() http.Handler {
 		r.Use(h.session)
 
 		r.Get("/", h.Home)
-		r.Get("/jfy", h.JustForYou)
 		r.Get("/search", h.Search)
 		r.Get("/c/{slug}", h.Category)
 		r.Get("/p/{slug}", h.Product)

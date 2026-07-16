@@ -3,15 +3,15 @@
     <a class="card-link" href="/p/{{.Slug}}">
         <div class="card-media">
             <img src="{{.Image}}" alt="{{.Title}}" loading="lazy" width="400" height="400">
-            {{if .CompareAtPrice}}<span class="badge badge-sale">-{{pct .Price .CompareAtPrice}}%</span>{{end}}
-            {{if not .InStock}}<span class="badge badge-oos">Out of stock</span>{{end}}
+            {{if not .InStock}}<span class="card-oos">Out of stock</span>{{end}}
         </div>
         <div class="card-body">
             <span class="card-category">{{.CategoryName}}</span>
             <h3 class="card-title">{{.Title}}</h3>
             <div class="card-price">
                 <span class="price">{{money .Price}}</span>
-                {{if .CompareAtPrice}}<span class="price-compare">{{moneyPtr .CompareAtPrice}}</span>{{end}}
+                {{if .CompareAtPrice}}<span class="price-compare">{{moneyPtr .CompareAtPrice}}</span>
+                <span class="price-off">−{{pct .Price .CompareAtPrice}}%</span>{{end}}
             </div>
         </div>
     </a>

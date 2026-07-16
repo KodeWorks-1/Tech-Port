@@ -15,9 +15,13 @@
                 </div>
                 <div class="cart-row-actions">
                     <div class="qty-stepper qty-stepper-sm">
-                        <button hx-post="/cart/items/{{.ID}}" hx-vals='{"qty": {{sub .Qty 1}}}' hx-target="#cart-box" hx-swap="outerHTML" aria-label="Decrease">−</button>
+                        <button hx-post="/cart/items/{{.ID}}" hx-vals='{"qty": {{sub .Qty 1}}}' hx-target="#cart-box" hx-swap="outerHTML" aria-label="Decrease quantity">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M5 12h14"/></svg>
+                        </button>
                         <span>{{.Qty}}</span>
-                        <button hx-post="/cart/items/{{.ID}}" hx-vals='{"qty": {{add .Qty 1}}}' hx-target="#cart-box" hx-swap="outerHTML" aria-label="Increase">+</button>
+                        <button hx-post="/cart/items/{{.ID}}" hx-vals='{"qty": {{add .Qty 1}}}' hx-target="#cart-box" hx-swap="outerHTML" aria-label="Increase quantity">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        </button>
                     </div>
                     <span class="cart-line-total">{{money .LineTotal}}</span>
                     <button class="cart-remove" hx-post="/cart/items/{{.ID}}" hx-vals='{"qty": 0}' hx-target="#cart-box" hx-swap="outerHTML">Remove</button>
@@ -34,7 +38,7 @@
                 <span>{{if eq .ShippingFee 0.0}}Free{{else}}{{money .ShippingFee}}{{end}}</span>
             </div>
             {{if gt .AmountToFreeShipping 0.0}}
-            <p class="free-ship-note">Add {{money .AmountToFreeShipping}} more for free shipping</p>
+            <p class="free-ship-note">{{money .AmountToFreeShipping}} away from free delivery</p>
             {{end}}
             <div class="summary-row summary-total"><span>Total</span><span>{{money .Total}}</span></div>
             <a class="btn btn-primary btn-block" href="/checkout">Proceed to checkout</a>

@@ -13,7 +13,7 @@
 
         {{if .Saved}}<div class="form-banner form-banner-success">Profile saved.</div>{{end}}
 
-        <form class="admin-panel" method="post" action="/account">
+        <form class="panel" method="post" action="/account">
             <label class="field">
                 <span>Full name</span>
                 <input name="name" value="{{.User.Name}}" required>

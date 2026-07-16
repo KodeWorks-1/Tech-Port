@@ -6,15 +6,15 @@
     <div class="container">
         <nav class="breadcrumb"><a href="/">Home</a> <span>/</span> {{.Category.Name}}</nav>
         <div class="listing-head">
-            <h1 class="page-title">{{.Category.Name}} <span class="count-pill">{{.Total}}</span></h1>
-            <select class="sort-select" onchange="location.href=this.value">
+            <h1 class="page-title">{{.Category.Name}} <span class="result-count">{{.Total}} products</span></h1>
+            <select class="sort-select" onchange="location.href=this.value" aria-label="Sort products">
                 <option value="/c/{{.Category.Slug}}" {{if eq .Sort ""}}selected{{end}}>Newest</option>
                 <option value="/c/{{.Category.Slug}}?sort=price_asc" {{if eq .Sort "price_asc"}}selected{{end}}>Price: low to high</option>
                 <option value="/c/{{.Category.Slug}}?sort=price_desc" {{if eq .Sort "price_desc"}}selected{{end}}>Price: high to low</option>
             </select>
         </div>
 
-        <div class="chip-row chip-row-tight">
+        <div class="chip-row">
             {{range .Categories}}
             <a class="chip {{if eq .ID $.Category.ID}}chip-active{{end}}" href="/c/{{.Slug}}">{{.Name}}</a>
             {{end}}
@@ -25,14 +25,24 @@
             {{range .Products}}{{template "product-card" .}}{{end}}
         </div>
         {{else}}
-        <p class="empty-note">No products in this category yet — check back soon!</p>
+        <p class="empty-note">No products in this category yet.</p>
         {{end}}
 
         {{if gt .TotalPages 1}}
         <nav class="pagination">
-            {{if gt .Page 1}}<a class="btn btn-outline" href="/c/{{.Category.Slug}}?sort={{.Sort}}&page={{.PrevPage}}">← Previous</a>{{end}}
+            {{if gt .Page 1}}
+            <a class="btn btn-outline" href="/c/{{.Category.Slug}}?sort={{.Sort}}&page={{.PrevPage}}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+                Previous
+            </a>
+            {{end}}
             <span class="page-info">Page {{.Page}} of {{.TotalPages}}</span>
-            {{if lt .Page .TotalPages}}<a class="btn btn-outline" href="/c/{{.Category.Slug}}?sort={{.Sort}}&page={{.NextPage}}">Next →</a>{{end}}
+            {{if lt .Page .TotalPages}}
+            <a class="btn btn-outline" href="/c/{{.Category.Slug}}?sort={{.Sort}}&page={{.NextPage}}">
+                Next
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            {{end}}
         </nav>
         {{end}}
     </div>

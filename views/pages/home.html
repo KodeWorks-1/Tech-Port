@@ -1,63 +1,21 @@
 {{define "content"}}
-<section class="banner-section">
+<section class="hero">
     <div class="container hero-grid">
-        <aside class="side-cats">
-            {{range .Categories}}
-            <a href="/c/{{.Slug}}">{{.Name}}</a>
-            {{end}}
-            <a href="/track">Track Order</a>
-            <a href="/warranty-returns">Warranty &amp; Returns</a>
-        </aside>
-
-        <div class="hero-carousel" x-data="{i: 0, n: 3}" x-init="setInterval(() => i = (i + 1) % n, 4500)">
-            <div class="carousel-track" :style="`transform: translateX(-${i * 100}%)`">
-                <a class="banner banner-main slide" href="#deals">
-                    <img class="slide-img" src="/static/img/products/coolbell-smart-board-bt-kb02-bluetooth-wireless-keyboard-with-touchpad-1.jpg" alt="CoolBell Smart Board keyboard" loading="eager">
-                    <span class="banner-kicker">Launch offers</span>
-                    <span class="banner-title">Genuine tech accessories<br>at Pakistan's best prices</span>
-                    <span class="banner-sub">Keyboards · Mice · Cooling Pads · Laptop Backpacks</span>
-                    <span class="btn btn-primary banner-cta">Shop deals</span>
-                </a>
-                <a class="banner banner-main slide slide-blue" href="/c/keyboards">
-                    <img class="slide-img" src="/static/img/products/coolbell-mkb-01-magic-wireless-keyboard-sleek-silent-and-multi-device-1.webp" alt="CoolBell MKB-01 wireless keyboard" loading="lazy">
-                    <span class="banner-kicker">CoolBell official range</span>
-                    <span class="banner-title">Wireless keyboards<br>from Rs. 1,500</span>
-                    <span class="banner-sub">Bluetooth · Dual mode · Rechargeable</span>
-                    <span class="btn btn-primary banner-cta">Shop keyboards</span>
-                </a>
-                <a class="banner banner-main slide slide-green" href="/c/cooling-pads">
-                    <img class="slide-img" src="/static/img/products/coolbell-cb-900-cooling-pad-for-14-17-inch-laptops-gaming-notebook-1.jpg" alt="CoolBell CB-900 cooling pad" loading="lazy">
-                    <span class="banner-kicker">Beat the heat</span>
-                    <span class="banner-title">Laptop cooling pads<br>&amp; RGB stands</span>
-                    <span class="banner-sub">Cash on delivery · 7-day returns</span>
-                    <span class="btn btn-primary banner-cta">Shop cooling</span>
-                </a>
+        <div class="hero-copy">
+            <span class="hero-eyebrow">CoolBell official range</span>
+            <h1 class="hero-title">Quality tech accessories, delivered.</h1>
+            <p class="hero-sub">Keyboards, mice, cooling pads and laptop backpacks — genuine products, tested before dispatch, cash on delivery anywhere in Pakistan.</p>
+            <div class="hero-actions">
+                {{with index .Categories 0}}<a class="btn btn-primary btn-lg" href="/c/{{.Slug}}">Shop {{.Name}}</a>{{end}}
+                <a class="btn btn-outline btn-lg" href="#categories">Browse categories</a>
             </div>
-            <div class="carousel-dots">
-                <button :class="i===0 && 'dot-active'" @click="i=0" aria-label="Slide 1"></button>
-                <button :class="i===1 && 'dot-active'" @click="i=1" aria-label="Slide 2"></button>
-                <button :class="i===2 && 'dot-active'" @click="i=2" aria-label="Slide 3"></button>
-            </div>
+            <p class="hero-note">Nationwide delivery in 2–5 working days · 7-day returns</p>
+        </div>
+        <div class="hero-media">
+            <img src="/static/img/products/coolbell-mkb-01-magic-wireless-keyboard-sleek-silent-and-multi-device-1.webp" alt="CoolBell MKB-01 wireless keyboard" width="480" height="340" loading="eager">
         </div>
     </div>
 </section>
-
-{{if .Deals}}
-<section class="section" id="deals">
-    <div class="container">
-        <div class="flash-panel">
-            <div class="flash-head">
-                <h2 class="flash-title">⚡ Flash Deals</h2>
-                <span class="flash-sub">Limited-time launch prices</span>
-                <a class="btn btn-outline flash-more" href="/search?q=coolbell">Shop more</a>
-            </div>
-            <div class="deal-strip">
-                {{range .Deals}}{{template "product-card" .}}{{end}}
-            </div>
-        </div>
-    </div>
-</section>
-{{end}}
 
 <section class="section" id="categories">
     <div class="container">
@@ -65,8 +23,11 @@
         <div class="cat-grid">
             {{range .Categories}}
             <a class="cat-card" href="/c/{{.Slug}}">
-                <span class="cat-card-img">{{if .Image}}<img src="{{.Image}}" alt="{{.Name}}" loading="lazy" width="120" height="120">{{end}}</span>
-                <span class="cat-card-name">{{.Name}}</span>
+                <span class="cat-card-img">{{if .Image}}<img src="{{.Image}}" alt="{{.Name}}" loading="lazy" width="320" height="240">{{end}}</span>
+                <span class="cat-card-name">
+                    {{.Name}}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </span>
             </a>
             {{end}}
         </div>
@@ -77,24 +38,10 @@
 <section class="section">
     <div class="container">
         <div class="section-head">
-            <h2 class="section-title">Popular right now</h2>
+            <h2 class="section-title">Best sellers</h2>
         </div>
         <div class="product-grid">
             {{range .Popular}}{{template "product-card" .}}{{end}}
-        </div>
-    </div>
-</section>
-{{end}}
-
-{{range .Sections}}
-<section class="section">
-    <div class="container">
-        <div class="section-head">
-            <h2 class="section-title">Top Selling {{.Category.Name}}</h2>
-            <a class="view-all" href="/c/{{.Category.Slug}}">View all →</a>
-        </div>
-        <div class="product-grid">
-            {{range .Products}}{{template "product-card" .}}{{end}}
         </div>
     </div>
 </section>
@@ -113,14 +60,20 @@
 </section>
 {{end}}
 
-<section class="section">
-    <div class="container">
-        <div class="section-head">
-            <h2 class="section-title">Just For You</h2>
+<div class="value-props">
+    <div class="container vp-row">
+        <div class="vp-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>
+            <div><strong>Cash on delivery</strong><span>Pay when your order is in your hands.</span></div>
         </div>
-        <div class="product-grid">
-            {{template "jfy-tail" .JFY}}
+        <div class="vp-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1.5"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            <div><strong>Nationwide delivery</strong><span>All major cities in 2–5 working days.</span></div>
+        </div>
+        <div class="vp-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            <div><strong>7-day returns</strong><span>Damaged or not as described — we replace it.</span></div>
         </div>
     </div>
-</section>
+</div>
 {{end}}

@@ -5,7 +5,7 @@
     <div class="container">
         <nav class="breadcrumb"><a href="/">Home</a> <span>/</span> Search</nav>
         {{if .Query}}
-        <h1 class="page-title">Results for "{{.Query}}" <span class="count-pill">{{len .Products}}</span></h1>
+        <h1 class="page-title">Results for "{{.Query}}" <span class="result-count">{{len .Products}} found</span></h1>
         {{if .Products}}
         <div class="product-grid listing-grid">
             {{range .Products}}{{template "product-card" .}}{{end}}

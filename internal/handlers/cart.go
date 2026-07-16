@@ -72,7 +72,7 @@ func (h *Handlers) CartAdd(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("HX-Trigger", `{"cart-updated":true,"toast":"Added to cart ✓"}`)
+	w.Header().Set("HX-Trigger", `{"cart-updated":true,"toast":"Added to cart"}`)
 	w.WriteHeader(http.StatusNoContent)
 }
 
