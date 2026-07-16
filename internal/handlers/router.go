@@ -11,11 +11,13 @@ import (
 
 type Handlers struct {
 	catalog  *services.Catalog
+	cart     *services.Cart
+	settings *services.Settings
 	renderer *Renderer
 }
 
-func New(catalog *services.Catalog, renderer *Renderer) *Handlers {
-	return &Handlers{catalog: catalog, renderer: renderer}
+func New(catalog *services.Catalog, cart *services.Cart, settings *services.Settings, renderer *Renderer) *Handlers {
+	return &Handlers{catalog: catalog, cart: cart, settings: settings, renderer: renderer}
 }
 
 func (h *Handlers) Router() http.Handler {
@@ -32,7 +34,19 @@ func (h *Handlers) Router() http.Handler {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
 	})
-	r.Get("/", h.Home)
+
+	r.Group(func(r chi.Router) {
+		r.Use(h.session)
+
+		r.Get("/", h.Home)
+		r.Get("/c/{slug}", h.Category)
+		r.Get("/p/{slug}", h.Product)
+
+		r.Get("/cart", h.CartPage)
+		r.Get("/cart/count", h.CartCount)
+		r.Post("/cart/items", h.CartAdd)
+		r.Post("/cart/items/{id}", h.CartSetQty)
+	})
 
 	return r
 }

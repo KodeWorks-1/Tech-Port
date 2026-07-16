@@ -38,8 +38,10 @@ func main() {
 	}
 
 	catalog := services.NewCatalog(pool)
+	cart := services.NewCart(pool)
+	settings := services.NewSettings(pool)
 	renderer := handlers.NewRenderer(cfg.Dev())
-	h := handlers.New(catalog, renderer)
+	h := handlers.New(catalog, cart, settings, renderer)
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,

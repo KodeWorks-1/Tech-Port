@@ -1,0 +1,123 @@
+{{define "title"}}{{.Title}} — Price in Pakistan | TechPort{{end}}
+{{define "meta_description"}}Buy {{.Title}} online in Pakistan at {{money .BasePrice}} with cash on delivery. {{.Brand}} — genuine product from TechPort.{{end}}
+
+{{define "content"}}
+<script>
+function pdp(variants, mainImg) {
+    return {
+        variants: variants,
+        sel: variants[0],
+        qty: 1,
+        mainImg: mainImg,
+        pick(v) { this.sel = v; if (this.qty > Math.max(v.stock, 1)) this.qty = 1; },
+        fmt(n) { return 'Rs. ' + n.toLocaleString('en-PK'); },
+        inc() { if (this.qty < this.sel.stock) this.qty++; },
+        dec() { if (this.qty > 1) this.qty--; }
+    };
+}
+</script>
+
+<section class="section">
+    <div class="container" x-data='pdp({{.VariantsJSON}}, {{if .Images}}"{{(index .Images 0).Path}}"{{else}}""{{end}})'>
+        <nav class="breadcrumb">
+            <a href="/">Home</a> <span>/</span>
+            <a href="/c/{{.CategorySlug}}">{{.CategoryName}}</a> <span>/</span>
+            {{.Title}}
+        </nav>
+
+        <div class="pdp-grid">
+            <div class="pdp-gallery">
+                <div class="pdp-main-img">
+                    <img :src="mainImg" src="{{if .Images}}{{(index .Images 0).Path}}{{end}}" alt="{{.Title}}" width="600" height="600">
+                </div>
+                {{if gt (len .Images) 1}}
+                <div class="pdp-thumbs">
+                    {{range .Images}}
+                    <button class="pdp-thumb" :class="mainImg==='{{.Path}}' && 'pdp-thumb-active'" @click="mainImg='{{.Path}}'">
+                        <img src="{{.Path}}" alt="{{.Alt}}" loading="lazy" width="80" height="80">
+                    </button>
+                    {{end}}
+                </div>
+                {{end}}
+            </div>
+
+            <div class="pdp-info">
+                <span class="card-category">{{.CategoryName}}{{if .Brand}} · {{.Brand}}{{end}}</span>
+                <h1 class="pdp-title">{{.Title}}</h1>
+
+                <div class="pdp-price-row">
+                    <span class="pdp-price" x-text="fmt(sel.price)">{{money .BasePrice}}</span>
+                    {{if .CompareAtPrice}}<span class="price-compare">{{moneyPtr .CompareAtPrice}}</span>
+                    <span class="badge-inline">SALE</span>{{end}}
+                </div>
+
+                <p class="stock-note" :class="sel.stock > 0 ? 'in-stock' : 'out-stock'"
+                   x-text="sel.stock > 0 ? (sel.stock <= 5 ? 'Only ' + sel.stock + ' left in stock' : 'In stock') : 'Out of stock'"></p>
+
+                {{if .HasOptions}}
+                <div class="variant-row">
+                    <span class="option-label">Options:</span>
+                    <template x-for="v in variants" :key="v.id">
+                        <button class="variant-btn" :class="sel.id===v.id && 'variant-btn-active'"
+                                @click="pick(v)" x-text="v.label"></button>
+                    </template>
+                </div>
+                {{end}}
+
+                <div class="buy-row">
+                    <div class="qty-stepper">
+                        <button type="button" @click="dec()" aria-label="Decrease quantity">−</button>
+                        <span x-text="qty">1</span>
+                        <button type="button" @click="inc()" aria-label="Increase quantity">+</button>
+                    </div>
+                    <button class="btn btn-primary btn-lg"
+                            hx-post="/cart/items" hx-swap="none"
+                            :hx-vals='JSON.stringify({variant_id: sel.id, qty: qty})'
+                            :disabled="sel.stock < 1">
+                        Add to cart
+                    </button>
+                </div>
+
+                {{if .WhatsAppLink}}
+                <a class="btn btn-whatsapp" href="{{.WhatsAppLink}}" target="_blank" rel="noopener">
+                    Order on WhatsApp
+                </a>
+                {{end}}
+
+                <ul class="pdp-trust">
+                    <li>Cash on delivery — pay when it arrives</li>
+                    <li>Delivery in 2–5 working days nationwide</li>
+                    <li>7-day easy returns</li>
+                </ul>
+            </div>
+        </div>
+
+        {{if .Description}}
+        <div class="pdp-section">
+            <h2 class="section-title">About this product</h2>
+            <p class="pdp-desc">{{.Description}}</p>
+        </div>
+        {{end}}
+
+        {{if .Specs}}
+        <div class="pdp-section">
+            <h2 class="section-title">Specifications</h2>
+            <table class="specs-table">
+                {{range $k, $v := .Specs}}
+                <tr><th>{{$k}}</th><td>{{$v}}</td></tr>
+                {{end}}
+            </table>
+        </div>
+        {{end}}
+
+        {{if .Related}}
+        <div class="pdp-section">
+            <h2 class="section-title">You may also like</h2>
+            <div class="product-grid">
+                {{range .Related}}{{template "product-card" .}}{{end}}
+            </div>
+        </div>
+        {{end}}
+    </div>
+</section>
+{{end}}

@@ -12,6 +12,8 @@ import (
 )
 
 var tmplFuncs = template.FuncMap{
+	"add": func(a, b int) int { return a + b },
+	"sub": func(a, b int) int { return a - b },
 	// money renders "Rs. 3,000" from a float rupee amount.
 	"money": func(v float64) string {
 		s := strconv.FormatFloat(v, 'f', 0, 64)
@@ -71,6 +73,21 @@ func (r *Renderer) load(page string) (*template.Template, error) {
 	}
 	r.cache[page] = t
 	return t, nil
+}
+
+// RenderPartial renders a named template from views/partials (no layout),
+// for HTMX fragment swaps.
+func (r *Renderer) RenderPartial(w http.ResponseWriter, name string, data any) {
+	t, err := r.load("home.html") // any page works: partials are parsed into every set
+	if err != nil {
+		slog.Error("partial load failed", "name", name, "err", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := t.ExecuteTemplate(w, name, data); err != nil {
+		slog.Error("partial render failed", "name", name, "err", err)
+	}
 }
 
 func (r *Renderer) Render(w http.ResponseWriter, page string, data any) {

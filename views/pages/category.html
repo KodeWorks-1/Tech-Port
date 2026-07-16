@@ -1,0 +1,40 @@
+{{define "title"}}{{.Category.Name}} — TechPort{{end}}
+{{define "meta_description"}}Shop {{.Category.Name}} online in Pakistan with cash on delivery — genuine products from TechPort.{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb"><a href="/">Home</a> <span>/</span> {{.Category.Name}}</nav>
+        <div class="listing-head">
+            <h1 class="page-title">{{.Category.Name}} <span class="count-pill">{{.Total}}</span></h1>
+            <select class="sort-select" onchange="location.href=this.value">
+                <option value="/c/{{.Category.Slug}}" {{if eq .Sort ""}}selected{{end}}>Newest</option>
+                <option value="/c/{{.Category.Slug}}?sort=price_asc" {{if eq .Sort "price_asc"}}selected{{end}}>Price: low to high</option>
+                <option value="/c/{{.Category.Slug}}?sort=price_desc" {{if eq .Sort "price_desc"}}selected{{end}}>Price: high to low</option>
+            </select>
+        </div>
+
+        <div class="chip-row chip-row-tight">
+            {{range .Categories}}
+            <a class="chip {{if eq .ID $.Category.ID}}chip-active{{end}}" href="/c/{{.Slug}}">{{.Name}}</a>
+            {{end}}
+        </div>
+
+        {{if .Products}}
+        <div class="product-grid listing-grid">
+            {{range .Products}}{{template "product-card" .}}{{end}}
+        </div>
+        {{else}}
+        <p class="empty-note">No products in this category yet — check back soon!</p>
+        {{end}}
+
+        {{if gt .TotalPages 1}}
+        <nav class="pagination">
+            {{if gt .Page 1}}<a class="btn btn-outline" href="/c/{{.Category.Slug}}?sort={{.Sort}}&page={{.PrevPage}}">← Previous</a>{{end}}
+            <span class="page-info">Page {{.Page}} of {{.TotalPages}}</span>
+            {{if lt .Page .TotalPages}}<a class="btn btn-outline" href="/c/{{.Category.Slug}}?sort={{.Sort}}&page={{.NextPage}}">Next →</a>{{end}}
+        </nav>
+        {{end}}
+    </div>
+</section>
+{{end}}
