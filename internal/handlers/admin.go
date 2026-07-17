@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 
@@ -101,6 +102,7 @@ type adminDashboardData struct {
 	Stats    services.Stats
 	LowStock []services.LowStockRow
 	Recent   []services.AdminOrderRow
+	Statuses []string
 }
 
 func (h *Handlers) AdminDashboard(w http.ResponseWriter, r *http.Request) {
@@ -125,6 +127,7 @@ func (h *Handlers) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	}
 	h.renderer.Render(w, "admin/dashboard.html", adminDashboardData{
 		Email: adminEmail(r), Stats: stats, LowStock: low, Recent: recent,
+		Statuses: services.ValidOrderStatuses,
 	})
 }
 
@@ -188,5 +191,11 @@ func (h *Handlers) AdminOrderStatus(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, "/admin/orders/"+chi.URLParam(r, "id"), http.StatusSeeOther)
+	// status is editable from the dashboard and orders list too — go back
+	// to wherever the change was made
+	back := r.FormValue("back")
+	if !strings.HasPrefix(back, "/admin") || strings.HasPrefix(back, "//") {
+		back = "/admin/orders/" + chi.URLParam(r, "id")
+	}
+	http.Redirect(w, r, back, http.StatusSeeOther)
 }

@@ -616,19 +616,20 @@ a { color: inherit; text-decoration: none; }
 .admin-body { background: #eef2f7; }
 .admin-header {
     position: sticky; top: 0; z-index: 50;
-    background: var(--ink);
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
 }
-.logo-light { color: #fff; }
-.admin-tag { font-style: normal; font-size: 0.72rem; font-weight: 700; color: #93c5fd; letter-spacing: 0.1em; text-transform: uppercase; }
+.logo-light { color: var(--ink); }
+.admin-tag { font-style: normal; font-size: 0.72rem; font-weight: 700; color: var(--brand); letter-spacing: 0.1em; text-transform: uppercase; }
 .admin-nav { display: flex; gap: 4px; margin-left: auto; overflow-x: auto; }
 .admin-nav a {
-    font-size: 0.9rem; font-weight: 600; color: #c3d0e2;
+    font-size: 0.9rem; font-weight: 600; color: #475569;
     padding: 8px 13px; border-radius: 8px; white-space: nowrap;
     transition: background 0.15s, color 0.15s;
 }
-.admin-nav a:hover { background: rgb(255 255 255 / 0.1); color: #fff; }
-.logout-btn { border: none; background: none; color: #8aa2c0; font: inherit; font-size: 0.88rem; cursor: pointer; text-decoration: underline; }
+.admin-nav a:hover { background: #eef2ff; color: var(--brand); }
+.logout-btn { border: none; background: none; color: var(--muted); font: inherit; font-size: 0.88rem; cursor: pointer; text-decoration: underline; }
 .logout-btn:hover { color: #ff8f8f; }
 .login-wrap { display: grid; place-items: center; min-height: 60vh; }
 .login-form { width: 100%; max-width: 380px; }
@@ -671,6 +672,14 @@ a { color: inherit; text-decoration: none; }
     font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
     background: var(--border); color: var(--muted);
 }
+/* inline status editor — a pill-shaped select tinted by the status-* classes */
+.status-select {
+    border: none; border-radius: 999px; padding: 4px 8px;
+    font: inherit; font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.03em;
+    background-color: var(--border); color: var(--muted); cursor: pointer;
+}
+.status-select:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
 .status-pending   { background: #fef3c7; color: #92400e; }
 .status-confirmed { background: #dbeafe; color: #1e40af; }
 .status-shipped   { background: #e0e7ff; color: #3730a3; }

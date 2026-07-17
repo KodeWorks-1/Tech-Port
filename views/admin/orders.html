@@ -31,7 +31,15 @@
                 <td>{{.City}}</td>
                 <td>{{.ItemCount}}</td>
                 <td>{{money .Total}}</td>
-                <td><span class="status-badge status-{{.Status}}">{{.Status}}</span></td>
+                <td>
+                    {{$o := .}}
+                    <form method="post" action="/admin/orders/{{.ID}}/status">
+                        <input type="hidden" name="back" value="/admin/orders{{if or $.Filter $.Search}}?status={{$.Filter}}&q={{$.Search}}{{end}}">
+                        <select class="status-select status-{{.Status}}" name="status" onchange="this.form.submit()" aria-label="Order status">
+                            {{range $.Statuses}}<option value="{{.}}" {{if eq . $o.Status}}selected{{end}}>{{.}}</option>{{end}}
+                        </select>
+                    </form>
+                </td>
             </tr>
             {{end}}
         </table>
