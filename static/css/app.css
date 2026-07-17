@@ -778,28 +778,24 @@ a { color: inherit; text-decoration: none; }
     .account-head { flex-direction: column; align-items: flex-start; }
 }
 
-/* Admin on phones: forms collapse to one column and tables drop secondary
-   columns so the key info (code, customer, total, status) fits without
-   swiping. Kept at the end of the file to win the cascade. */
+/* Admin on phones: forms collapse to one column; tables keep every column
+   and swipe horizontally inside their own container (visible scrollbar).
+   Kept at the end of the file to win the cascade. */
 @media (max-width: 719px) {
     .field-row { grid-template-columns: 1fr; }
     .listing-head .admin-search { max-width: none; }
 
-    .orders-table th:nth-child(2), .orders-table td:nth-child(2),
-    .orders-table th:nth-child(4), .orders-table td:nth-child(4),
-    .orders-table th:nth-child(5), .orders-table td:nth-child(5),
-    .orders-table th:nth-child(6), .orders-table td:nth-child(6) { display: none; }
-
-    .dash-orders th:nth-child(3), .dash-orders td:nth-child(3) { display: none; }
-
-    .products-table th:nth-child(3), .products-table td:nth-child(3),
-    .products-table th:nth-child(6), .products-table td:nth-child(6) { display: none; }
+    /* long product titles truncate so the swipe distance stays sane */
     .products-table td:nth-child(2) a {
-        display: inline-block; max-width: 150px;
+        display: inline-block; max-width: 200px;
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         vertical-align: middle;
     }
 
     .variant-form { flex-wrap: wrap; }
     .variant-form input[name="options"] { flex: 1 1 100%; }
+}
+/* swipeable tables advertise themselves with a slim scrollbar */
+@media (max-width: 900px) {
+    .admin-table, .admin-table-wide { scrollbar-width: thin; }
 }
