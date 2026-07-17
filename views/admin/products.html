@@ -12,7 +12,7 @@
         </div>
 
         {{if .Products}}
-        <table class="admin-table admin-table-wide">
+        <table class="admin-table admin-table-wide products-table">
             <tr><th></th><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Sold</th><th>Status</th><th class="th-actions">Actions</th></tr>
             {{$q := .Search}}
             {{range .Products}}
