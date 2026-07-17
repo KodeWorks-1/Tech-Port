@@ -5,12 +5,14 @@
     <div class="acct-menu" x-show="open" x-cloak>
         <a href="/account">My Account</a>
         <a href="/account/orders">My Orders</a>
-        <form method="post" action="/logout"><button type="submit">Logout</button></form>
+        {{if not demoMode}}<form method="post" action="/logout"><button type="submit">Logout</button></form>{{end}}
     </div>
 </div>
 {{else}}
+{{if not demoMode}}
 <a href="/login">Login</a>
 <span class="promo-sep">|</span>
 <a href="/register">Sign Up</a>
+{{end}}
 {{end}}
 {{end}}

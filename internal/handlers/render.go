@@ -77,11 +77,13 @@ type Renderer struct {
 	cache map[string]*template.Template
 }
 
-func NewRenderer(dev bool, extra template.FuncMap) *Renderer {
+func NewRenderer(dev, demo bool, extra template.FuncMap) *Renderer {
 	funcs := template.FuncMap{}
 	for k, v := range tmplFuncs {
 		funcs[k] = v
 	}
+	// demoMode lets templates hide auth UI (logout/login/signup) in demo mode.
+	funcs["demoMode"] = func() bool { return demo }
 	for k, v := range extra {
 		funcs[k] = v
 	}

@@ -10,16 +10,28 @@ import (
 	"github.com/KodeWorks-1/techport/internal/services"
 )
 
-// currentUser returns the logged-in customer, or ok=false.
+// currentUser returns the logged-in customer, or ok=false. In demo mode a
+// session with no user is silently attached to the demo account first, so
+// every visitor is always logged in.
 func (h *Handlers) currentUser(r *http.Request) (services.User, bool) {
 	u, err := h.users.BySession(r.Context(), sessionID(r))
-	if err != nil {
-		if !errors.Is(err, services.ErrNotFound) {
-			slog.Error("current user", "err", err)
-		}
+	if err == nil {
+		return u, true
+	}
+	if !errors.Is(err, services.ErrNotFound) {
+		slog.Error("current user", "err", err)
 		return services.User{}, false
 	}
-	return u, true
+	if h.demo && h.demoUserID != 0 {
+		if err := h.users.AttachSession(r.Context(), sessionID(r), h.demoUserID); err != nil {
+			slog.Error("demo auto-login", "err", err)
+			return services.User{}, false
+		}
+		if u, err := h.users.BySession(r.Context(), sessionID(r)); err == nil {
+			return u, true
+		}
+	}
+	return services.User{}, false
 }
 
 // requireUser gates account pages behind login.
@@ -157,8 +169,10 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Logout(w http.ResponseWriter, r *http.Request) {
-	if err := h.users.DetachSession(r.Context(), sessionID(r)); err != nil {
-		slog.Warn("logout", "err", err)
+	if !h.demo {
+		if err := h.users.DetachSession(r.Context(), sessionID(r)); err != nil {
+			slog.Warn("logout", "err", err)
+		}
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

@@ -17,8 +17,13 @@ const adminCookie = "tp_admin"
 const adminEmailKey ctxKey = 1
 
 // requireAdmin gates /admin routes behind a valid admin session.
+// In demo mode the gate is open: everyone is admin, no login needed.
 func (h *Handlers) requireAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if h.demo {
+			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), adminEmailKey, "admin")))
+			return
+		}
 		c, err := r.Cookie(adminCookie)
 		if err != nil {
 			http.Redirect(w, r, "/admin/login", http.StatusSeeOther)
@@ -44,6 +49,10 @@ type adminLoginData struct {
 }
 
 func (h *Handlers) AdminLoginPage(w http.ResponseWriter, r *http.Request) {
+	if h.demo {
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
+		return
+	}
 	h.renderer.Render(w, "admin/login.html", adminLoginData{})
 }
 
@@ -72,6 +81,10 @@ func (h *Handlers) AdminLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) AdminLogout(w http.ResponseWriter, r *http.Request) {
+	if h.demo {
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
+		return
+	}
 	if c, err := r.Cookie(adminCookie); err == nil {
 		if err := h.adminAuth.Logout(r.Context(), c.Value); err != nil {
 			slog.Warn("admin logout", "err", err)

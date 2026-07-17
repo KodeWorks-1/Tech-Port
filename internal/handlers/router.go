@@ -20,13 +20,17 @@ type Handlers struct {
 	admin     *services.Admin
 	adminAuth *services.AdminAuth
 	renderer  *Renderer
+	// demo mode: no admin login, every visitor auto-logged-in as demoUserID
+	demo       bool
+	demoUserID int64
 }
 
 func New(catalog *services.Catalog, cart *services.Cart, orders *services.Orders,
 	users *services.Users, settings *services.Settings, admin *services.Admin,
-	adminAuth *services.AdminAuth, renderer *Renderer) *Handlers {
+	adminAuth *services.AdminAuth, renderer *Renderer, demo bool, demoUserID int64) *Handlers {
 	return &Handlers{catalog: catalog, cart: cart, orders: orders, users: users,
-		settings: settings, admin: admin, adminAuth: adminAuth, renderer: renderer}
+		settings: settings, admin: admin, adminAuth: adminAuth, renderer: renderer,
+		demo: demo, demoUserID: demoUserID}
 }
 
 func (h *Handlers) Router() http.Handler {

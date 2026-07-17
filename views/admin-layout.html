@@ -20,7 +20,7 @@
             <a href="/admin/settings">Settings</a>
             <a href="/" target="_blank">View store ↗</a>
         </nav>
-        <form method="post" action="/admin/logout"><button class="logout-btn" type="submit">Log out</button></form>
+        {{if not demoMode}}<form method="post" action="/admin/logout"><button class="logout-btn" type="submit">Log out</button></form>{{end}}
     </div>
 </header>
 

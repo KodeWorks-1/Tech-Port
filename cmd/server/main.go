@@ -44,8 +44,19 @@ func main() {
 	users := services.NewUsers(pool)
 	admin := services.NewAdmin(pool)
 	adminAuth := services.NewAdminAuth(pool)
-	renderer := handlers.NewRenderer(cfg.Dev(), handlers.NavFuncs(catalog, settings))
-	h := handlers.New(catalog, cart, orders, users, settings, admin, adminAuth, renderer)
+	var demoUserID int64
+	if cfg.Demo {
+		id, err := users.EnsureDemoUser(context.Background())
+		if err != nil {
+			slog.Error("demo user seed failed", "err", err)
+			os.Exit(1)
+		}
+		demoUserID = id
+		slog.Info("DEMO MODE: admin login bypassed, visitors auto-logged-in (set DEMO_MODE=0 to disable)")
+	}
+
+	renderer := handlers.NewRenderer(cfg.Dev(), cfg.Demo, handlers.NavFuncs(catalog, settings))
+	h := handlers.New(catalog, cart, orders, users, settings, admin, adminAuth, renderer, cfg.Demo, demoUserID)
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,

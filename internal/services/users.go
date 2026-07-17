@@ -29,6 +29,24 @@ func NewUsers(pool *pgxpool.Pool) *Users {
 	return &Users{pool: pool}
 }
 
+// EnsureDemoUser upserts the account every visitor is auto-logged-in as in
+// demo mode, and returns its id. Address/city are pre-filled so checkout
+// demos well.
+func (u *Users) EnsureDemoUser(ctx context.Context) (int64, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte("demo1234"), bcrypt.DefaultCost)
+	if err != nil {
+		return 0, err
+	}
+	var id int64
+	err = u.pool.QueryRow(ctx, `
+		INSERT INTO users (name, phone, email, password_hash, address, city)
+		VALUES ('Demo Customer', '03001234567', 'demo@techport.pk', $1,
+		        'House 12, Street 5, Gulberg III', 'Lahore')
+		ON CONFLICT (phone) DO UPDATE SET name = users.name
+		RETURNING id`, string(hash)).Scan(&id)
+	return id, err
+}
+
 // Register creates an account keyed by (normalized) phone number.
 func (u *Users) Register(ctx context.Context, name, phone, password, email string) (int64, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)

@@ -10,6 +10,10 @@ type Config struct {
 	Env         string
 	Port        string
 	DatabaseURL string
+	// Demo disables all auth for client demos: /admin needs no login and
+	// every visitor is auto-logged-in as the demo customer. Default ON —
+	// set DEMO_MODE=0 before a real launch.
+	Demo bool
 }
 
 // Load reads .env (if present) into the process environment, then builds the
@@ -23,10 +27,12 @@ func Load() Config {
 	if dbURL == "" {
 		dbURL = "postgres://techport:techport@localhost:5543/techport?sslmode=disable"
 	}
+	demo := strings.ToLower(getenv("DEMO_MODE", "1"))
 	return Config{
 		Env:         getenv("ENV", "dev"),
 		Port:        getenv("PORT", "8080"),
 		DatabaseURL: dbURL,
+		Demo:        demo != "0" && demo != "false",
 	}
 }
 

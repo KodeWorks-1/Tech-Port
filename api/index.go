@@ -48,8 +48,16 @@ func setup() {
 	users := services.NewUsers(pool)
 	admin := services.NewAdmin(pool)
 	adminAuth := services.NewAdminAuth(pool)
-	renderer := handlers.NewRenderer(cfg.Dev(), handlers.NavFuncs(catalog, settings))
-	router = handlers.New(catalog, cart, orders, users, settings, admin, adminAuth, renderer).Router()
+	var demoUserID int64
+	if cfg.Demo {
+		demoUserID, initErr = users.EnsureDemoUser(ctx)
+		if initErr != nil {
+			return
+		}
+	}
+
+	renderer := handlers.NewRenderer(cfg.Dev(), cfg.Demo, handlers.NavFuncs(catalog, settings))
+	router = handlers.New(catalog, cart, orders, users, settings, admin, adminAuth, renderer, cfg.Demo, demoUserID).Router()
 }
 
 // Handler is the Vercel entrypoint.

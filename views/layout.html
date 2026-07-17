@@ -22,7 +22,7 @@
             {{with storePhone}}<a href="https://wa.me/{{.}}" target="_blank" rel="noopener">Help</a>
             <span class="promo-sep">|</span>{{end}}
             <span class="promo-account" hx-get="/account/menu" hx-trigger="load, acct-updated from:body" hx-swap="innerHTML">
-                <a href="/login">Login</a> <span class="promo-sep">|</span> <a href="/register">Sign Up</a>
+                {{if not demoMode}}<a href="/login">Login</a> <span class="promo-sep">|</span> <a href="/register">Sign Up</a>{{end}}
             </span>
         </span>
     </div>

@@ -16,9 +16,18 @@ Or with [just](https://github.com/casey/just): `just db-up`, `just dev`.
 Config via `.env` (copy from `.env.example`). A fresh database is seeded with
 demo products so the store is browsable immediately.
 
+## Demo mode (default ON)
+
+`DEMO_MODE=1` (the default) disables all auth for client demos: `/admin`
+opens with no login, every visitor is automatically logged in as the seeded
+demo customer ("Demo Customer", 0300 1234567), and logout / login / sign-up
+are hidden. **Set `DEMO_MODE=0` before any real launch** — until then the
+admin panel is open to anyone with the URL.
+
 ## Admin
 
-`/admin` — first run seeds ID `admin` / password `admin123` (**change this
+`/admin` — no login needed while demo mode is on. With `DEMO_MODE=0`, first
+run seeds ID `admin` / password `admin123` (**change this
 before going live**). Manages orders (status flow with automatic restock on
 cancel/return), products, variants, images, categories, and store settings
 (shipping fee, WhatsApp number, payment method visibility).
