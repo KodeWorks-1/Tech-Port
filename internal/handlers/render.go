@@ -40,6 +40,8 @@ var tmplFuncs = template.FuncMap{
 		}
 		return embeddedCSSVer
 	},
+	// paragraphs splits description text into lines for <p>-per-line rendering.
+	"paragraphs": func(s string) []string { return strings.Split(s, "\n") },
 	// money renders "Rs. 3,000" from a float rupee amount.
 	"money": func(v float64) string {
 		s := strconv.FormatFloat(v, 'f', 0, 64)

@@ -105,7 +105,9 @@ function pdp(variants, mainImg) {
         {{if .Description}}
         <div class="pdp-section">
             <h2 class="section-title">About this product</h2>
-            <p class="pdp-desc">{{.Description}}</p>
+            <div class="pdp-desc">
+                {{range paragraphs .Description}}{{if .}}<p>{{.}}</p>{{end}}{{end}}
+            </div>
         </div>
         {{end}}
 

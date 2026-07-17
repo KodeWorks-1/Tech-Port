@@ -352,6 +352,7 @@ func (h *Handlers) AdminCategoryCreate(w http.ResponseWriter, r *http.Request) {
 		if err := h.admin.CreateCategory(r.Context(), name); err != nil {
 			slog.Error("admin category create", "err", err)
 		}
+		h.notifyNavChanged()
 	}
 	http.Redirect(w, r, "/admin/categories", http.StatusSeeOther)
 }
@@ -407,5 +408,6 @@ func (h *Handlers) AdminSettingsSave(w http.ResponseWriter, r *http.Request) {
 			slog.Error("admin settings: save methods", "err", err)
 		}
 	}
+	h.notifyNavChanged()
 	http.Redirect(w, r, "/admin/settings?saved=1", http.StatusSeeOther)
 }

@@ -13,8 +13,9 @@ import (
 
 // NavFuncs exposes site-wide header/footer data (categories, phone number)
 // to every template via cached template funcs, so page handlers don't have
-// to thread it through their data structs.
-func NavFuncs(catalog *services.Catalog, settings *services.Settings) template.FuncMap {
+// to thread it through their data structs. The returned invalidate func
+// drops the cache so admin edits (settings, categories) show up instantly.
+func NavFuncs(catalog *services.Catalog, settings *services.Settings) (template.FuncMap, func()) {
 	var mu sync.Mutex
 	var cats []models.Category
 	var phone string
@@ -42,8 +43,13 @@ func NavFuncs(catalog *services.Catalog, settings *services.Settings) template.F
 		return cats, phone
 	}
 
+	invalidate := func() {
+		mu.Lock()
+		fetched = time.Time{}
+		mu.Unlock()
+	}
 	return template.FuncMap{
 		"navCategories": func() []models.Category { c, _ := refresh(); return c },
 		"storePhone":    func() string { _, p := refresh(); return p },
-	}
+	}, invalidate
 }

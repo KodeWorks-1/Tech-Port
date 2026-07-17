@@ -1,0 +1,19 @@
+{{define "title"}}New Arrivals — TechPort{{end}}
+{{define "meta_description"}}The newest tech accessories at TechPort — fresh keyboards, mice, cooling pads and more with cash on delivery across Pakistan.{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb"><a href="/">Home</a> <span>/</span> New Arrivals</nav>
+        <h1 class="page-title">New Arrivals</h1>
+
+        {{if .Products}}
+        <div class="product-grid listing-grid">
+            {{range .Products}}{{template "product-card" .}}{{end}}
+        </div>
+        {{else}}
+        <p class="empty-note">Nothing new right now — check back soon!</p>
+        {{end}}
+    </div>
+</section>
+{{end}}

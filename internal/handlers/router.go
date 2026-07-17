@@ -23,6 +23,18 @@ type Handlers struct {
 	// demo mode: no admin login, every visitor auto-logged-in as demoUserID
 	demo       bool
 	demoUserID int64
+	// navChanged invalidates the cached header/footer nav data after admin edits
+	navChanged func()
+}
+
+// OnNavChange registers the callback fired when admin edits change
+// site-wide nav data (store settings, categories).
+func (h *Handlers) OnNavChange(f func()) { h.navChanged = f }
+
+func (h *Handlers) notifyNavChanged() {
+	if h.navChanged != nil {
+		h.navChanged()
+	}
 }
 
 func New(catalog *services.Catalog, cart *services.Cart, orders *services.Orders,
@@ -61,6 +73,8 @@ func (h *Handlers) Router() http.Handler {
 
 		r.Get("/", h.Home)
 		r.Get("/jfy", h.JustForYou)
+		r.Get("/explore", h.Explore)
+		r.Get("/new-arrivals", h.NewArrivals)
 		r.Get("/search", h.Search)
 		r.Get("/c/{slug}", h.Category)
 		r.Get("/p/{slug}", h.Product)

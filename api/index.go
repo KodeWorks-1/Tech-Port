@@ -40,6 +40,9 @@ func setup() {
 	if initErr = db.SeedIfEmpty(ctx, pool); initErr != nil {
 		return
 	}
+	if initErr = db.DataFixes(ctx, pool); initErr != nil {
+		return
+	}
 
 	catalog := services.NewCatalog(pool)
 	cart := services.NewCart(pool)
@@ -56,8 +59,11 @@ func setup() {
 		}
 	}
 
-	renderer := handlers.NewRenderer(cfg.Dev(), cfg.Demo, handlers.NavFuncs(catalog, settings))
-	router = handlers.New(catalog, cart, orders, users, settings, admin, adminAuth, renderer, cfg.Demo, demoUserID).Router()
+	navFuncs, navInvalidate := handlers.NavFuncs(catalog, settings)
+	renderer := handlers.NewRenderer(cfg.Dev(), cfg.Demo, navFuncs)
+	h := handlers.New(catalog, cart, orders, users, settings, admin, adminAuth, renderer, cfg.Demo, demoUserID)
+	h.OnNavChange(navInvalidate)
+	router = h.Router()
 }
 
 // Handler is the Vercel entrypoint.

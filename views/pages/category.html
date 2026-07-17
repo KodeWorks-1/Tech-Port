@@ -14,12 +14,6 @@
             </select>
         </div>
 
-        <div class="chip-row chip-row-tight">
-            {{range .Categories}}
-            <a class="chip {{if eq .ID $.Category.ID}}chip-active{{end}}" href="/c/{{.Slug}}">{{.Name}}</a>
-            {{end}}
-        </div>
-
         {{if .Products}}
         <div class="product-grid listing-grid">
             {{range .Products}}{{template "product-card" .}}{{end}}

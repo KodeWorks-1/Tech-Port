@@ -97,6 +97,41 @@ func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+type exploreData struct {
+	Categories []services.CategoryCard
+	Popular    []models.ProductCard
+}
+
+// Explore is the dedicated category-browsing page behind the mobile
+// bottom-nav "Explore" tab.
+func (h *Handlers) Explore(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	categories, err := h.catalog.CategoriesWithImage(ctx)
+	if err != nil {
+		slog.Error("explore: categories", "err", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	popular, err := h.catalog.Popular(ctx, 8)
+	if err != nil {
+		slog.Error("explore: popular", "err", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	h.renderer.Render(w, "explore.html", exploreData{Categories: categories, Popular: popular})
+}
+
+// NewArrivals lists the latest products as a dedicated page.
+func (h *Handlers) NewArrivals(w http.ResponseWriter, r *http.Request) {
+	products, err := h.catalog.Latest(r.Context(), 24)
+	if err != nil {
+		slog.Error("new arrivals", "err", err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+	h.renderer.Render(w, "new-arrivals.html", struct{ Products []models.ProductCard }{products})
+}
+
 // JustForYou serves subsequent feed pages for the htmx load-more button.
 func (h *Handlers) JustForYou(w http.ResponseWriter, r *http.Request) {
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))

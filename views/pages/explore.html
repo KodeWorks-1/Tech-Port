@@ -1,0 +1,31 @@
+{{define "title"}}Explore — TechPort{{end}}
+{{define "meta_description"}}Browse all TechPort categories — keyboards, mice, cooling pads, laptop backpacks and accessories with cash on delivery across Pakistan.{{end}}
+
+{{define "content"}}
+<section class="section">
+    <div class="container">
+        <h1 class="section-title">Explore</h1>
+        <div class="cat-grid">
+            {{range .Categories}}
+            <a class="cat-card" href="/c/{{.Slug}}">
+                <span class="cat-card-img">{{if .Image}}<img src="{{.Image}}" alt="{{.Name}}" loading="lazy" width="120" height="120">{{end}}</span>
+                <span class="cat-card-name">{{.Name}}</span>
+            </a>
+            {{end}}
+        </div>
+    </div>
+</section>
+
+{{if .Popular}}
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <h2 class="section-title">Popular right now</h2>
+        </div>
+        <div class="product-grid">
+            {{range .Popular}}{{template "product-card" .}}{{end}}
+        </div>
+    </div>
+</section>
+{{end}}
+{{end}}

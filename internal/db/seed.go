@@ -126,7 +126,7 @@ func SeedIfEmpty(ctx context.Context, pool *pgxpool.Pool) error {
 
 	settings := map[string]string{
 		"shipping_fee":    `{"flat": 250, "free_above": 5000}`,
-		"whatsapp_number": `"+92XXXXXXXXXX"`,
+		"whatsapp_number": `"+923001234567"`,
 		"payment_methods": `[
 			{"key":"cod","label":"Cash on Delivery","enabled":true},
 			{"key":"card","label":"Credit / Debit Card","enabled":false},

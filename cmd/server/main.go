@@ -36,6 +36,10 @@ func main() {
 		slog.Error("seed failed", "err", err)
 		os.Exit(1)
 	}
+	if err := db.DataFixes(context.Background(), pool); err != nil {
+		slog.Error("data fixes failed", "err", err)
+		os.Exit(1)
+	}
 
 	catalog := services.NewCatalog(pool)
 	cart := services.NewCart(pool)
@@ -55,8 +59,10 @@ func main() {
 		slog.Info("DEMO MODE: admin login bypassed, visitors auto-logged-in (set DEMO_MODE=0 to disable)")
 	}
 
-	renderer := handlers.NewRenderer(cfg.Dev(), cfg.Demo, handlers.NavFuncs(catalog, settings))
+	navFuncs, navInvalidate := handlers.NavFuncs(catalog, settings)
+	renderer := handlers.NewRenderer(cfg.Dev(), cfg.Demo, navFuncs)
 	h := handlers.New(catalog, cart, orders, users, settings, admin, adminAuth, renderer, cfg.Demo, demoUserID)
+	h.OnNavChange(navInvalidate)
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,
