@@ -174,11 +174,6 @@ a { color: inherit; text-decoration: none; }
     }
 }
 
-/* Wide tables scroll inside their own container instead of panning the page */
-@media (max-width: 900px) {
-    .admin-table, .admin-table-wide { display: block; overflow-x: auto; white-space: nowrap; }
-    .specs-table { display: block; overflow-x: auto; }
-}
 
 /* Header */
 .site-header {
@@ -795,7 +790,12 @@ a { color: inherit; text-decoration: none; }
     .variant-form { flex-wrap: wrap; }
     .variant-form input[name="options"] { flex: 1 1 100%; }
 }
-/* swipeable tables advertise themselves with a slim scrollbar */
+/* Wide tables swipe inside their own container instead of panning the page.
+   Must stay at the END of the file: .admin-table-wide's base overflow:hidden
+   (round-corner clipping) would otherwise win the cascade and block touch. */
 @media (max-width: 900px) {
-    .admin-table, .admin-table-wide { scrollbar-width: thin; }
+    .admin-table, .admin-table-wide {
+        display: block; overflow-x: auto; white-space: nowrap; scrollbar-width: thin;
+    }
+    .specs-table { display: block; overflow-x: auto; }
 }
