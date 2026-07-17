@@ -171,30 +171,6 @@ a { color: inherit; text-decoration: none; }
     }
 }
 
-/* Mobile polish */
-@media (max-width: 560px) {
-    .promo-msg { display: none; }
-    .promo-row { justify-content: center; }
-    .logo { font-size: 1.2rem; }
-    .logo img { width: 32px; height: 32px; }
-    .header-row { gap: 10px; min-height: 56px; }
-    .section { padding: 26px 0 6px; }
-    .banner-main { padding: 24px 18px; min-height: 210px; }
-    .slide { padding-right: 42% !important; }
-    .slide-img { right: 10px; width: 38%; border-radius: 8px; }
-    .banner-cta { padding: 10px 18px; font-size: 0.9rem; }
-    .product-grid { gap: 10px; }
-    .card-body { padding: 10px 11px 11px; }
-    .card-add { margin: 0 10px 10px; }
-    .pdp-title { font-size: 1.15rem; }
-    .buy-row { flex-wrap: wrap; }
-    .buy-row .btn { flex: 1 1 100%; }
-    .listing-head { flex-direction: column; align-items: stretch; }
-    .cart-row { grid-template-columns: 64px 1fr; }
-    .cart-thumb { width: 64px; height: 64px; }
-    .cart-row-actions { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; }
-    .account-head { flex-direction: column; align-items: flex-start; }
-}
 /* Wide admin tables scroll instead of breaking the page */
 @media (max-width: 900px) {
     .admin-table-wide { display: block; overflow-x: auto; white-space: nowrap; }
@@ -754,3 +730,35 @@ a { color: inherit; text-decoration: none; }
 }
 .footer-bottom p { margin: 0; }
 .footer-links a:hover { color: var(--text); }
+
+/* Mobile polish — kept at the end of the file so these rules win the
+   cascade over the base component styles above. Compact, Daraz-style
+   chrome: no promo row, slim logo bar, tight search pill. */
+@media (max-width: 560px) {
+    .promo-bar { display: none; }
+    .header-row { gap: 6px 10px; min-height: 46px; padding-top: 7px; padding-bottom: 9px; }
+    .logo { font-size: 1.05rem; gap: 6px; }
+    .logo img { width: 27px; height: 27px; }
+    .search-form input { padding: 7px 14px; font-size: 0.88rem; }
+    .search-form button { padding: 0 13px; }
+    .search-form button svg { width: 16px; height: 16px; }
+    .cart-btn { width: 38px; height: 38px; }
+    .cart-btn svg { width: 21px; height: 21px; }
+    .cat-nav-row a { padding: 8px 11px; font-size: 0.84rem; }
+    .section { padding: 26px 0 6px; }
+    .banner-main { padding: 24px 18px; min-height: 210px; }
+    .slide { padding-right: 42% !important; }
+    .slide-img { right: 10px; width: 38%; border-radius: 8px; }
+    .banner-cta { padding: 10px 18px; font-size: 0.9rem; }
+    .product-grid { gap: 10px; }
+    .card-body { padding: 10px 11px 11px; }
+    .card-add { margin: 0 10px 10px; }
+    .pdp-title { font-size: 1.15rem; }
+    .buy-row { flex-wrap: wrap; }
+    .buy-row .btn { flex: 1 1 100%; }
+    .listing-head { flex-direction: column; align-items: stretch; }
+    .cart-row { grid-template-columns: 64px 1fr; }
+    .cart-thumb { width: 64px; height: 64px; }
+    .cart-row-actions { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; }
+    .account-head { flex-direction: column; align-items: flex-start; }
+}
